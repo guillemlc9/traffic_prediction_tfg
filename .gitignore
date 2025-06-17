@@ -1,0 +1,13 @@
+# Entorns virtuals
+.venv/
+__pycache__/
+*.pyc
+
+# Dades (evitem pujar-les)
+data/
+*.csv
+*.zip
+
+# Arxius temporals
+.DS_Store
+.ipynb_checkpoints/
