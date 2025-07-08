@@ -11,4 +11,4 @@ Aquest projecte forma part del Treball Final de Grau (TFG) i té com a objectiu 
 
 ## Requisits
 
-Vegeu `environment.yml` per configurar l'entorn.
+Vegeu `requirements.txt` per configurar l'entorn.
