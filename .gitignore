@@ -7,6 +7,7 @@ __pycache__/
 data/
 *.csv
 *.zip
+*.parquet
 
 # Arxius temporals
 .DS_Store
