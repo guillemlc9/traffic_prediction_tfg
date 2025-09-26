@@ -20,7 +20,7 @@ def find_gaps(df: pl.DataFrame,
               id_col: str = "idTram",
               ts_col: str = "timestamp",
               freq_minutes: int = 5,
-              tolerance_minutes: int = 1) -> pl.DataFrame:
+              tolerance_minutes: int = 4) -> pl.DataFrame:
     """
     Detecta buits temporals per cada tram.
 
@@ -75,10 +75,10 @@ def classify_gaps(gaps: pl.DataFrame) -> pl.DataFrame:
     """
     return gaps.with_columns(
         pl.when(pl.col("gap_minutes") <= 15)
-          .then("short")
+          .then(pl.lit("short"))
           .when(pl.col("gap_minutes") <= 60)
-          .then("medium")
-          .otherwise("long")
+          .then(pl.lit("medium"))
+          .otherwise(pl.lit("long"))
           .alias("gap_type")
     )
 
