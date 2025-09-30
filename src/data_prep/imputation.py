@@ -1,3 +1,10 @@
+"""
+imputation.py
+-------------
+Fitxer per imputar els valors no òptims, depenent de la durada de cada
+tipus de gap entre registres.
+"""
+
 import polars as pl
 from src.data_prep.gaps import find_gaps, classify_gaps
 

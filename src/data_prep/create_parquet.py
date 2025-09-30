@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 create_dataset_1y.py
 --------------------
@@ -14,9 +13,9 @@ from pathlib import Path
 
 # --- Configuració -----------------------------------------------------------
 
-# Carpeta amb els CSV d'origen (canvia si la teva estructura és diferent)
-RAW_DIR = Path("/Users/guillemlopezcolomer/Library/CloudStorage/GoogleDrive-guillemlc9@gmail.com/My Drive/TFG/Data/Open Data BCN/Trànsit/dades")        # ex: traffic-prediction-tfg/data/raw
-OUTPUT  = Path("/Users/guillemlopezcolomer/Desktop/traffic_prediction_tfg/data")  # on guardarem el parquet
+# Carpetes
+RAW_DIR = Path("/Users/guillemlopezcolomer/Library/CloudStorage/GoogleDrive-guillemlc9@gmail.com/My Drive/TFG/Data/Open Data BCN/Trànsit/dades")
+OUTPUT  = Path("/Users/guillemlopezcolomer/Desktop/traffic_prediction_tfg/data")  # on guardarem l'output
 OUTPUT.mkdir(parents=True, exist_ok=True)
 
 PARQUET_FILE = OUTPUT / "dataset_1y.parquet"
@@ -24,7 +23,7 @@ PARQUET_FILE = OUTPUT / "dataset_1y.parquet"
 # ---------------------------------------------------------------------------
 
 def read_and_clean_csv(csv_path: Path) -> pl.DataFrame:
-    """Llegeix un CSV i fa la conversió del camp 'data' a timestamp real."""
+    """Llegeix un CSV i fa la conversió del camp 'data' a timestamp."""
     df = pl.read_csv(
         csv_path,
         schema_overrides={
@@ -35,7 +34,7 @@ def read_and_clean_csv(csv_path: Path) -> pl.DataFrame:
         }
     )
 
-    # Converteix 'data' (YYYYMMDDHHMMSS) a datetime i crea columna 'timestamp'
+    # Converteix 'data' (YYYYMMDDHHMMSS) a datetime i crea la columna 'timestamp'
     df = df.with_columns(
         pl.col("data")
           .str.strptime(pl.Datetime, format="%Y%m%d%H%M%S")
@@ -54,7 +53,6 @@ def main():
     print("Concatenant…")
     df_all = pl.concat(dfs, how="vertical")
 
-    # Ordena per tram i temps, elimina duplicats exactes
     df_all = (
         df_all.unique()
               .sort(["idTram", "timestamp"])

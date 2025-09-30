@@ -2,7 +2,7 @@
 gaps.py
 -------
 Funcions per detectar i analitzar buits temporals en el dataset
-de trànsit de Barcelona (registres cada 5 minuts).
+de trànsit.
 
 Ús bàsic:
 ---------
@@ -22,7 +22,7 @@ def find_gaps(df: pl.DataFrame,
               freq_minutes: int = 5,
               tolerance_minutes: int = 4) -> pl.DataFrame:
     """
-    Detecta buits temporals per cada tram.
+    Detecta buits temporals per tram.
 
     Parameters
     ----------
@@ -33,9 +33,9 @@ def find_gaps(df: pl.DataFrame,
     ts_col : str
         Nom de la columna de timestamp (Datetime)
     freq_minutes : int
-        Freqüència esperada entre lectures
+        Freqüència esperada entre lectures (en minuts)
     tolerance_minutes : int
-        Marge addicional per considerar un buit (p. ex. 1 min)
+        Marge addicional per considerar un buit (en minuts)
 
     Returns
     -------
