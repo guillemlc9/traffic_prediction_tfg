@@ -4,7 +4,6 @@ Aquest projecte forma part del Treball Final de Grau (TFG) i té com a objectiu 
 
 ## Estructura del projecte
 
-- `data/` — Conté (fora del repo) les dades brutes i tractades
 - `notebooks/` — Jupyter notebooks per exploració i proves
 - `src/` — Mòduls de codi Python reutilitzable
 - `reports/` — Informes, gràfics i visualitzacions
