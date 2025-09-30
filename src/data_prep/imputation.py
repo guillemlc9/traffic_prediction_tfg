@@ -6,6 +6,7 @@ tipus de gap entre registres, amb l'ajuda de gaps.py.
 """
 
 from datetime import timedelta
+from pathlib import Path
 
 import polars as pl
 from src.data_prep.gaps import find_gaps, classify_gaps
@@ -13,7 +14,11 @@ from src.data_prep.gaps import find_gaps, classify_gaps
 FREQ_MINUTES = 5
 freq = timedelta(minutes=FREQ_MINUTES)
 freq_interval = f"{FREQ_MINUTES}m"
-df = pl.read_parquet("data/dataset_1y.parquet")
+df = pl.read_parquet("/Users/guillemlopezcolomer/Desktop/traffic_prediction_tfg/data/dataset_1y.parquet")
+
+df = df.with_columns(
+    pl.col("timestamp").dt.truncate("5m")
+)
 
 gaps = classify_gaps(find_gaps(df))
 
@@ -24,20 +29,19 @@ cal = (
           pl.min("timestamp").alias("start"),
           pl.max("timestamp").alias("end")
       )
-      .with_columns(
+      .with_columns([
           pl.col("start").dt.truncate("5m").alias("start"),
           pl.when(pl.col("end").dt.truncate("5m") == pl.col("end"))
             .then(pl.col("end"))
             .otherwise(pl.col("end").dt.truncate("5m") + freq)
-            .alias("end")
-      )
-      .explode(
-          pl.date_ranges(
-              pl.col("start"),
-              pl.col("end"),
-              interval=freq_interval,
-              eager=True
-          ).alias("timestamp")
+            .alias("end"),
+          ((pl.col("end") - pl.col("start"))
+             .dt.total_minutes() // FREQ_MINUTES).cast(pl.Int64).alias("n_offsets")
+      ])
+      .with_columns(pl.int_ranges(0, pl.col("n_offsets") + 1).alias("offset_idx"))
+      .explode("offset_idx")
+      .with_columns(
+          (pl.col("start") + pl.col("offset_idx") * freq).alias("timestamp")
       )
       .select(["idTram", "timestamp"])
 )
@@ -58,45 +62,100 @@ expanded_gaps = (
           .alias("slots")
     ])
     .with_columns(
-        pl.date_ranges(
-            pl.col("gap_start") + freq,
-            pl.col("gap_end"),
-            interval=freq_interval,
-            eager=True
-        ).alias("missing_ts")
+        pl.int_ranges(1, pl.col("slots") + 1).alias("offset_idx")
     )
-    .explode("missing_ts")
-    .select(["idTram", pl.col("missing_ts").alias("timestamp"), "gap_type"])
+    .explode("offset_idx")
+    .with_columns(
+        (pl.col("gap_start") + pl.col("offset_idx") * freq).alias("timestamp")
+    )
+    .select(["idTram", "timestamp", "gap_type"])
 )
+
 
 full_df = full_df.join(expanded_gaps, on=["idTram", "timestamp"], how="left")
 
-full_df = full_df.with_row_count("row_id")
+full_df = full_df.with_row_index("row_id")
 
 # 4. Imputació per type = short
 def impute_short(df_slice):
-    prev = df_slice.join_asof(
-        df_slice.filter(~pl.col("is_gap")),
-        on="timestamp",
+    df_sorted = df_slice.sort(["idTram", "timestamp"])
+    valid = df_sorted.filter(~pl.col("is_gap")).select(["idTram", "timestamp", "estatActual"])
+
+    valid_prev = valid.rename({
+        "timestamp": "timestamp_prev",
+        "estatActual": "prev"
+    })
+
+    prev = df_sorted.join_asof(
+        valid_prev,
+        left_on="timestamp",
+        right_on="timestamp_prev",
         by="idTram",
         strategy="backward"
-    ).rename({"estatActual_right": "prev"})
-    nxt = df_slice.join_asof(
-        df_slice.filter(~pl.col("is_gap")),
-        on="timestamp",
+    )
+
+    prev = prev.select([
+        "row_id",
+        "idTram",
+        "timestamp",
+        "estatActual",
+        "is_gap",
+        "gap_type",
+        "prev",
+        "timestamp_prev"
+    ])
+
+    valid_next = valid.rename({
+        "timestamp": "timestamp_next",
+        "estatActual": "next"
+    })
+
+    nxt = df_sorted.join_asof(
+        valid_next,
+        left_on="timestamp",
+        right_on="timestamp_next",
         by="idTram",
         strategy="forward"
-    ).rename({"estatActual_right": "next"})
+    )
+
+    nxt = nxt.select([
+        "row_id",
+        "next",
+        "timestamp_next"
+    ])
+
+    ts = pl.col("timestamp").cast(pl.Int64)
+    ts_prev = pl.col("timestamp_prev").cast(pl.Int64)
+    ts_next = pl.col("timestamp_next").cast(pl.Int64)
+
+    ratio = (
+        pl.when(
+            (pl.col("prev").is_null()) |
+            (pl.col("next").is_null()) |
+            (ts_next - ts_prev == 0) |
+            ts_prev.is_null() |
+            ts_next.is_null()
+        )
+          .then(pl.lit(None))
+          .otherwise((ts - ts_prev).cast(pl.Float64) / (ts_next - ts_prev))
+    )
+
+    interp = (
+        pl.col("prev") + (pl.col("next") - pl.col("prev")) * ratio
+    ).round().cast(pl.Int64)
+
     return (
-        prev.join(nxt, on=["idTram", "timestamp"])
+        prev.join(nxt, on="row_id", how="left")
             .with_columns(
                 pl.when(pl.col("is_gap") & (pl.col("gap_type") == "short"))
                   .then(
-                      (
-                          pl.col("prev") + (pl.col("next") - pl.col("prev")) *
-                          ((pl.col("timestamp") - pl.col("timestamp_prev")).dt.nanosecond()
-                           / (pl.col("timestamp_next") - pl.col("timestamp_prev")).dt.nanosecond())
-                      ).round().cast(pl.Int64)
+                      pl.when(pl.col("prev").is_not_null() & pl.col("next").is_not_null() & ratio.is_not_null())
+                        .then(interp)
+                        .when(pl.col("prev").is_not_null())
+                        .then(pl.col("prev").cast(pl.Int64))
+                        .when(pl.col("next").is_not_null())
+                        .then(pl.col("next").cast(pl.Int64))
+                        .otherwise(pl.col("estatActual"))
                   )
                   .otherwise(pl.col("estatActual"))
                   .alias("estatActual")
@@ -162,4 +221,5 @@ full_df = impute_medium(full_df)
 full_df = full_df.with_columns(
     pl.col("estatActual").is_null().not_().alias("estatActual_imputed")
 ).drop(["row_id", "prev", "next", "timestamp_prev", "timestamp_next"], strict=False)
+Path("data/processed").mkdir(parents=True, exist_ok=True)
 full_df.write_parquet("data/processed/dataset_imputed.parquet")
