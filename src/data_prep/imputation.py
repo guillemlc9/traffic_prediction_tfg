@@ -15,6 +15,7 @@ from src.data_prep.gaps import find_gaps, classify_gaps, classify_gaps_from_cale
 
 FREQ_MINUTES = 5
 FREQ = pl.duration(minutes=FREQ_MINUTES)
+LOOKBACK_STEPS = 12
 
 SRC_PARQUET = "/Users/guillemlopezcolomer/Desktop/traffic_prediction_tfg/data/dataset_1y.parquet"
 OUT_DIR = "data/processed"
@@ -25,6 +26,12 @@ OUT_PARQUET = f"{OUT_DIR}/dataset_imputed.parquet"
 def snap_to_5min_mode(df: pl.DataFrame) -> pl.DataFrame:
     return (
         df
+        .with_columns(
+            pl.when(pl.col("estatActual").is_in([0, 6]))
+              .then(None)
+              .otherwise(pl.col("estatActual"))
+              .alias("estatActual")
+        )
         .with_columns(pl.col("timestamp").dt.truncate(f"{FREQ_MINUTES}m").alias("timestamp_5m"))
         .group_by(["idTram", "timestamp_5m"])
         .agg([
@@ -187,7 +194,128 @@ def impute_medium(df_slice: pl.DataFrame, window_minutes: int = 60) -> pl.DataFr
                 .drop("estatActual_imputed")
     )
 
-# ---------- Main (chunk per tram) ----------
+
+    """
+    Long gaps: imputa amb el MODE històric per (weekday, slot_5min).
+    - weekday: 0=dl ... 6=dg
+    - slot_5min: minut-del-dia // 5
+    Fa servir NOMÉS punts no-gap (originals) per construir la història.
+    """
+    # features temporals
+    tmp = df_slice.with_columns([
+        pl.col("timestamp").dt.weekday().alias("_wd"),
+        (
+            pl.col("timestamp").dt.hour() * 12 + (pl.col("timestamp").dt.minute() / 5).floor()
+        ).cast(pl.Int16).alias("_slot"),
+    ])
+
+    # Històric des d'observacions originals (no-gaps)
+    hist = (
+        tmp.filter(~pl.col("is_gap") & pl.col("estatActual").is_not_null())
+           .group_by(["_wd","_slot","estatActual"])
+           .agg(pl.len().alias("w"))
+           .group_by(["_wd","_slot"])
+           .agg(pl.col("estatActual").take(pl.col("w").arg_max()).alias("_mode_hist"))
+    )
+
+    # Fallback global (per si algun (wd,slot) no té prou històric)
+    fallback = (
+        tmp.filter(~pl.col("is_gap") & pl.col("estatActual").is_not_null())
+           .group_by("estatActual").agg(pl.len().alias("w"))
+           .with_columns(pl.col("w").arg_max().alias("_idx"))
+    )
+    global_mode = (
+        fallback.select(pl.col("estatActual").take(pl.col("_idx")).alias("_global_mode"))
+                .to_series().item()
+        if fallback.height > 0 else None
+    )
+
+    # Aplica al long
+    out = (
+        tmp.join(hist, on=["_wd","_slot"], how="left")
+           .with_columns(
+               pl.when(
+                   pl.col("estatActual").is_null() &
+                   pl.col("is_gap") &
+                   (pl.col("gap_type") == "long") &
+                   pl.col("_mode_hist").is_not_null()
+               )
+               .then(pl.col("_mode_hist").cast(pl.Int8))
+               .when(
+                   pl.col("estatActual").is_null() &
+                   pl.col("is_gap") &
+                   (pl.col("gap_type") == "long") &
+                   pl.lit(global_mode).is_not_null()
+               )
+               .then(pl.lit(global_mode).cast(pl.Int8))
+               .otherwise(pl.col("estatActual"))
+               .alias("estatActual")
+           )
+           .drop(["_wd","_slot","_mode_hist"])
+    )
+    return out
+
+def impute_long_with_history(df_slice: pl.DataFrame) -> pl.DataFrame:
+    """
+    Long gaps: imputa amb el MODE històric per (weekday, slot_5min).
+    - weekday: 0=dl ... 6=dg
+    - slot_5min: minut-del-dia // 5
+    Fa servir NOMÉS punts no-gap (originals) per construir la història.
+    """
+    # features temporals (Opció B arreglada)
+    tmp = df_slice.with_columns([
+        pl.col("timestamp").dt.weekday().alias("_wd"),
+        (
+            pl.col("timestamp").dt.hour() * 12
+            + (pl.col("timestamp").dt.minute() / 5).floor()
+        ).cast(pl.Int16).alias("_slot"),
+    ])
+
+    # Històric: comptem freqüències per (wd, slot, estatActual) i triem el més freqüent
+    hist = (
+        tmp.filter(~pl.col("is_gap") & pl.col("estatActual").is_not_null())
+           .group_by(["_wd", "_slot", "estatActual"])
+           .agg(pl.len().alias("w"))
+           .sort(["_wd", "_slot", "w"], descending=[False, False, True])
+           .group_by(["_wd", "_slot"])
+           .agg(pl.col("estatActual").first().alias("_mode_hist"))
+    )
+
+    # Fallback global (per si algun (wd,slot) no té prou històric)
+    fb_tbl = (
+        tmp.filter(~pl.col("is_gap") & pl.col("estatActual").is_not_null())
+           .group_by("estatActual").agg(pl.len().alias("w"))
+           .sort("w", descending=True)
+           .select(pl.col("estatActual").first().alias("_global_mode"))
+    )
+    global_mode = fb_tbl["_global_mode"][0] if fb_tbl.height > 0 else None
+
+    # Aplica només sobre long
+    out = (
+        tmp.join(hist, on=["_wd", "_slot"], how="left")
+           .with_columns(
+               pl.when(
+                   pl.col("estatActual").is_null()
+                   & pl.col("is_gap")
+                   & (pl.col("gap_type") == "long")
+                   & pl.col("_mode_hist").is_not_null()
+               )
+               .then(pl.col("_mode_hist").cast(pl.Int8))
+               .when(
+                   pl.col("estatActual").is_null()
+                   & pl.col("is_gap")
+                   & (pl.col("gap_type") == "long")
+                   & pl.lit(global_mode).is_not_null()
+               )
+               .then(pl.lit(global_mode).cast(pl.Int8))
+               .otherwise(pl.col("estatActual"))
+               .alias("estatActual")
+           )
+           .drop(["_wd", "_slot", "_mode_hist"])
+    )
+    return out
+
+# ---------- Main ----------
 
 def main() -> None:
     Path(OUT_DIR).mkdir(parents=True, exist_ok=True)
@@ -201,6 +329,14 @@ def main() -> None:
         pl.col("estatActual").cast(pl.Int8),
         pl.col("estatPrevist").cast(pl.Int8, strict=False)  # si existeix
     ]).sort(["idTram","timestamp"])
+
+    df = df.with_columns(
+        pl.when(pl.col("estatActual").is_in([0, 6]))
+        .then(None)
+        .otherwise(pl.col("estatActual"))
+        .cast(pl.Int8)
+        .alias("estatActual")
+    )
 
     # Snap a 5' — processarem PER TRAM i acumularem chunks per escriure 1 fitxer al final
     trams: List[int] = df.select("idTram").unique().to_series().to_list()
@@ -223,9 +359,10 @@ def main() -> None:
         # Gaps per tram (sobre df5_t)
         full_t = classify_gaps_from_calendar(full_t, freq_minutes=FREQ_MINUTES)
 
-        # Imputacions (curt + mitjà)
+        # Imputacions
         full_t = impute_short(full_t)
         full_t = impute_medium(full_t, window_minutes=60)
+        full_t = impute_long_with_history(full_t)
 
         # Bandera final i selecció de columnes
         full_t = (
@@ -241,9 +378,13 @@ def main() -> None:
     # Escriure un únic Parquet (sense append)
     if all_chunks:
         combined = pl.concat(all_chunks, how="vertical_relaxed")
-        combined.write_parquet(OUT_PARQUET)
+        combined.write_parquet(OUT_PARQUET)  # p.ex. data/processed/dataset_imputed.parquet
 
-        # Petit resum
+        # ➕ Versió neta per modelatge (estatActual ∈ {1..5})
+        OUT_PARQUET_CLEAN = f"{OUT_DIR}/dataset_imputed_clean.parquet"
+        combined_clean = combined.filter(pl.col("estatActual").is_between(1, 5))
+        combined_clean.write_parquet(OUT_PARQUET_CLEAN)
+
         out = combined.select([
             pl.len().alias("rows"),
             pl.col("estatActual").is_null().sum().alias("nulls_estatActual"),
@@ -251,7 +392,8 @@ def main() -> None:
             pl.col("estatActual_imputed").sum().alias("valors_no_null_despres_imputacio"),
         ])
         print(out)
-        print(f"✔ Parquet escrit a: {OUT_PARQUET}")
+        print(f"✔ Parquet complet: {OUT_PARQUET}")
+        print(f"✔ Parquet net (1..5): {OUT_PARQUET_CLEAN}")
     else:
         print("No s'han generat chunks (cap tram amb dades).")
 
