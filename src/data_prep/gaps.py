@@ -140,7 +140,6 @@ def classify_gaps_from_calendar(df: pl.DataFrame, freq_minutes: int = 5) -> pl.D
                 .alias("_chg"),
           ])
           .with_columns([
-              # id de run consecutiu
               pl.col("_chg").cum_sum().alias("_run_id"),
               pl.col("is_gap").cast(pl.Int8).alias("_gap"),
           ])
