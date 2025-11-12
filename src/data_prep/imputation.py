@@ -26,27 +26,33 @@ OUT_PARQUET = f"{OUT_DIR}/dataset_imputed.parquet"
 def snap_to_5min_mode(df: pl.DataFrame) -> pl.DataFrame:
     return (
         df
-        .with_columns(
+        .with_columns([
             pl.when(pl.col("estatActual").is_in([0, 6]))
               .then(None)
               .otherwise(pl.col("estatActual"))
-              .alias("estatActual")
-        )
-        .with_columns(pl.col("timestamp").dt.truncate(f"{FREQ_MINUTES}m").alias("timestamp_5m"))
+              .alias("estatActual"),
+            pl.col("timestamp").dt.truncate(f"{FREQ_MINUTES}m").alias("timestamp_5m")])
         .group_by(["idTram", "timestamp_5m"])
         .agg([
             pl.col("estatActual").mode().first().alias("estatActual_mode"),
             pl.col("estatActual").last().alias("estatActual_last"),
+            pl.col("estatPrevist").mode().first().alias("estatPrevist_mode"),
+            pl.col("estatPrevist").last().alias("estatPrevist_last"),
         ])
-        .with_columns(
+        .with_columns([
             pl.when(pl.col("estatActual_mode").is_not_null())
               .then(pl.col("estatActual_mode"))
               .otherwise(pl.col("estatActual_last"))
               .cast(pl.Int8)
-              .alias("estatActual")
-        )
+              .alias("estatActual"),
+            pl.when(pl.col("estatPrevist_mode").is_not_null())
+              .then(pl.col("estatPrevist_mode"))
+              .otherwise(pl.col("estatPrevist_last"))
+              .cast(pl.Int8)
+              .alias("estatPrevist"),
+        ])
         .rename({"timestamp_5m": "timestamp"})
-        .select(["idTram", "timestamp", "estatActual"])
+        .select(["idTram", "timestamp", "estatActual", "estatPrevist"])
         .sort(["idTram", "timestamp"])
     )
 
@@ -278,7 +284,9 @@ def main() -> None:
     all_chunks: List[pl.DataFrame] = []
 
     for i, t in enumerate(trams, 1):
-        df_t = df.filter(pl.col("idTram") == t).select(["idTram","timestamp","estatActual"])
+        df_t = (df.filter(pl.col("idTram") == t)
+                  .select(["idTram","timestamp","estatActual", "estatPrevist"])
+        )
         if df_t.is_empty():
             continue
 
@@ -302,7 +310,14 @@ def main() -> None:
         # Bandera final i selecció de columnes
         full_t = (
             full_t.with_columns(pl.col("estatActual").is_null().not_().alias("estatActual_imputed"))
-                  .select(["idTram","timestamp","estatActual","is_gap","gap_type","estatActual_imputed"])
+                  .select([
+                      "idTram",
+                      "timestamp",
+                      "estatActual",
+                      "estatPrevist",
+                      "is_gap",
+                      "gap_type",
+                      "estatActual_imputed"])
         )
 
         all_chunks.append(full_t)
