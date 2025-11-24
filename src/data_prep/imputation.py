@@ -167,7 +167,7 @@ def impute_medium(df_slice: pl.DataFrame, window_minutes: int = 60) -> pl.DataFr
         tolerance=tol,
     )
 
-    # Combina escollint el més proper (Polars 0.20.29+ → how="full")
+    # Combina escollint el més proper
     both = (
         back.join(fwd, on="timestamp", how="full")
             .with_columns([
@@ -325,7 +325,7 @@ def main() -> None:
         if i % 10 == 0 or i == len(trams):
             print(f"[{i}/{len(trams)}] Processat idTram={t} -> {full_t.height} files")
 
-    # Escriure un únic Parquet (sense append)
+    # Escriure un únic Parquet
     if all_chunks:
         combined = pl.concat(all_chunks, how="vertical_relaxed")
         combined.write_parquet(OUT_PARQUET)
