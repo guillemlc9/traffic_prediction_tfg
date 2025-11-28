@@ -179,8 +179,8 @@ def main(trams: list = None, seasonal: bool = False):
 
 if __name__ == "__main__":
     # Els teus 30 trams
-    trams = [233,158,57,526,83,445,11,22,460,178,126,534,164,50,278,293,388,478,
-             270,332,254,224,117,100,104,409,31,221,360,303]
-    
+    trams = [233,158,57,526,83,445,11,22,460,178,126,534,164,50,278,388,478,270,332,
+             254,224,293,117,100,104,409,31,221,360,303]
+
     # Executem Auto ARIMA (sense estacionalitat per ara)
     results = main(trams=trams, seasonal=False)
