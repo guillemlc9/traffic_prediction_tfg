@@ -199,7 +199,7 @@ def train_all_models(
     print(f"  Train: {splits_info['train_start']} → {splits_info['train_end']}")
     print(f"  Val:   {splits_info['val_start']} → {splits_info['val_end']}")
     print(f"  Test:  {splits_info['test_start']} → {splits_info['test_end']}")
-    print("\n⚠️  Utilitzant només dades de TRAIN per entrenar els models")
+    print("\nUtilitzant només dades de TRAIN per entrenar els models")
     
     # Entrenar models
     results = []
@@ -220,7 +220,7 @@ def train_all_models(
         if result['success'] and save_models:
             model_path = save_model(result['model'], tram_id, order)
             result['model_path'] = model_path
-            print(f"  💾 Model guardat: {model_path}")
+            print(f"Model guardat: {model_path}")
         else:
             result['model_path'] = None
         
@@ -239,7 +239,7 @@ def train_all_models(
     # Guardar mètriques
     Path(MODELS_DIR).mkdir(parents=True, exist_ok=True)
     results_df.write_parquet(OUTPUT_METRICS)
-    print(f"\n💾 Mètriques guardades: {OUTPUT_METRICS}")
+    print(f"\nMètriques guardades: {OUTPUT_METRICS}")
     
     # Resum
     print("\n" + "=" * 60)

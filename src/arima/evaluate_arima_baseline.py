@@ -22,6 +22,7 @@ warnings.filterwarnings('ignore')
 
 import matplotlib.pyplot as plt
 import seaborn as sns
+import openpyxl
 
 from statsmodels.tsa.arima.model import ARIMA
 from src.data_prep.prepare_time_splits import (
@@ -36,6 +37,7 @@ DATA_PATH = "data/processed/dataset_imputed_clean.parquet"
 MODELS_DIR = "models/arima"
 OUTPUT_METRICS = "models/arima/evaluation_metrics.parquet"
 OUTPUT_PLOTS_DIR = "reports/arima"
+VARIANCE_CLASSIFICATION_PATH = "data/processed/trams_variancia_classificats.xlsx"
 
 
 def load_model_params(tram_id: int, models_dir: str = MODELS_DIR) -> Dict:
@@ -113,7 +115,7 @@ def calculate_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> Dict:
     """
     mae = np.mean(np.abs(y_true - y_pred))
     rmse = np.sqrt(np.mean((y_true - y_pred) ** 2))
-    mape = np.mean(np.abs((y_true - y_pred) / (y_true + 1e-10))) * 100  # +epsilon per evitar divisió per 0
+    mape = np.mean(np.abs((y_true - y_pred) / (y_true + 1e-10))) * 100
     
     return {
         'mae': mae,
@@ -248,7 +250,7 @@ def evaluate_all_models(
         print(f"  Q3: {successful_df['rmse'].quantile(0.75):.4f}")
         print(f"  Max: {successful_df['rmse'].max():.4f}")
     
-    print("\n✅ Avaluació completada!")
+    print("\nAvaluació completada!")
     
     return results_df
 
@@ -273,6 +275,16 @@ def create_visualizations(metrics_df: pl.DataFrame, split: str = 'test'):
     
     # Filtrar només models correctes
     successful_df = metrics_df.filter(pl.col('success') == True).to_pandas()
+    
+    # Carregar classificació de variància
+    variance_df = pl.read_excel(VARIANCE_CLASSIFICATION_PATH)
+    variance_dict = dict(zip(
+        variance_df['idTram'].to_list(),
+        variance_df['categoria_variancia'].to_list()
+    ))
+    
+    # Afegir categoria de variància al DataFrame de mètriques
+    successful_df['categoria_variancia'] = successful_df['idTram'].map(variance_dict)
     
     # Configurar estil
     sns.set_style("whitegrid")
@@ -314,36 +326,54 @@ def create_visualizations(metrics_df: pl.DataFrame, split: str = 'test'):
     # Guardar figura
     output_path = f"{OUTPUT_PLOTS_DIR}/metrics_distribution_{split}.png"
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
-    print(f"\n📊 Visualització guardada: {output_path}")
+    print(f"\nVisualització guardada: {output_path}")
     
     plt.close()
     
-    # Crear gràfic addicional: MAE per tram (barplot)
+    # Crear gràfic addicional: MAE per tram (barplot amb colors per categoria de variància)
     fig, ax = plt.subplots(figsize=(16, 6))
     
+    # Ordenar per MAE
     successful_df_sorted = successful_df.sort_values('mae')
-    colors = ['green' if mae < mae_mean else 'orange' if mae < mae_mean * 1.5 else 'red' 
-              for mae in successful_df_sorted['mae']]
+    
+    # Definir colors per categoria de variància
+    color_map = {
+        'alta': '#d62728',      # Vermell
+        'mitjana': '#ff7f0e',   # Taronja
+        'baixa': '#2ca02c'      # Verd
+    }
+    
+    # Assignar colors segons la categoria de variància
+    colors = [color_map.get(cat, 'gray') for cat in successful_df_sorted['categoria_variancia']]
     
     ax.bar(range(len(successful_df_sorted)), successful_df_sorted['mae'], color=colors, alpha=0.7, edgecolor='black')
     ax.set_xticks(range(len(successful_df_sorted)))
     ax.set_xticklabels(successful_df_sorted['idTram'], rotation=45, ha='right')
     ax.set_xlabel('ID Tram', fontsize=12)
     ax.set_ylabel('MAE', fontsize=12)
-    ax.set_title(f'MAE per Tram - Split: {split.upper()}', fontsize=14, fontweight='bold')
-    ax.axhline(mae_mean, color='red', linestyle='--', linewidth=2, label=f'Mitjana: {mae_mean:.4f}')
+    ax.set_title(f'MAE per Tram (color per categoria de variància) - Split: {split.upper()}', fontsize=14, fontweight='bold')
+    ax.axhline(mae_mean, color='black', linestyle='--', linewidth=2, label=f'Mitjana: {mae_mean:.4f}')
     ax.grid(True, alpha=0.3, axis='y')
-    ax.legend()
+    
+    # Crear llegenda personalitzada per les categories
+    from matplotlib.patches import Patch
+    legend_elements = [
+        Patch(facecolor=color_map['alta'], edgecolor='black', alpha=0.7, label='Variància Alta'),
+        Patch(facecolor=color_map['mitjana'], edgecolor='black', alpha=0.7, label='Variància Mitjana'),
+        Patch(facecolor=color_map['baixa'], edgecolor='black', alpha=0.7, label='Variància Baixa'),
+        plt.Line2D([0], [0], color='black', linestyle='--', linewidth=2, label=f'Mitjana MAE: {mae_mean:.4f}')
+    ]
+    ax.legend(handles=legend_elements, loc='upper left')
     
     plt.tight_layout()
     
     output_path = f"{OUTPUT_PLOTS_DIR}/mae_per_tram_{split}.png"
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
-    print(f"📊 Visualització guardada: {output_path}")
+    print(f"Visualització guardada: {output_path}")
     
     plt.close()
     
-    print("\n✅ Visualitzacions completades!")
+    print("\nVisualitzacions completades!")
 
 
 def main():
@@ -360,7 +390,7 @@ def main():
     # Crear visualitzacions
     create_visualizations(metrics_test, split='test')
     
-    # També podem avaluar sobre validació si volem
+    # Avaluem sobre Val
     print("\n\n" + "=" * 60)
     print("Avaluant models sobre el conjunt de VALIDACIÓ...")
     metrics_val = evaluate_all_models(

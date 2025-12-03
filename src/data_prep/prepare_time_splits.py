@@ -213,7 +213,7 @@ def print_splits_summary(splits_info: Dict[str, datetime]) -> None:
 
 def main():
     """
-    Exemple d'ús del mòdul.
+    Ús del mòdul.
     """
     # Carregar dades
     DATA_PATH = "data/processed/dataset_imputed_clean.parquet"
@@ -228,7 +228,7 @@ def main():
     print(f"\nPreparant dades per {len(SELECTED_TRAMS)} trams...")
     data = get_all_trams_data(df, SELECTED_TRAMS)
     
-    # Exemple: obtenir dades d'un tram
+    # Obtenim dades d'un tram
     print(f"\nExemple - Tram {SELECTED_TRAMS[0]}:")
     for split in ['train', 'val', 'test']:
         series = data['get_tram_series'](SELECTED_TRAMS[0], split)
@@ -244,7 +244,7 @@ def main():
         total = len(train) + len(val) + len(test)
         print(f"  Tram {tram_id:3d}: Train={len(train):6d}, Val={len(val):5d}, Test={len(test):5d}, Total={total:6d}")
     
-    print(f"\n✅ Preparació completada!")
+    print(f"\nPreparació completada!")
 
 
 if __name__ == "__main__":
