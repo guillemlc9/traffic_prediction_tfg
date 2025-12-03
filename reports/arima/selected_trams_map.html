@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_5c06e0961f54ac4108c71f4a6cfb314f {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+</head>
+<body>
+    
+    
+    <div style="position: fixed; 
+                top: 10px; left: 50px; width: 300px; height: 60px; 
+                background-color: white; border:2px solid #3498db; z-index:9999; 
+                font-size:16px; padding: 10px; border-radius: 5px;
+                box-shadow: 0 0 15px rgba(0,0,0,0.3);">
+        <h3 style="margin: 0; color: #3498db;">30 Trams Seleccionats</h3>
+        <p style="margin: 5px 0; font-size: 12px;">Barcelona - Xarxa de Trànsit</p>
+    </div>
+    
+    
+            <div class="folium-map" id="map_5c06e0961f54ac4108c71f4a6cfb314f" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_5c06e0961f54ac4108c71f4a6cfb314f = L.map(
+                "map_5c06e0961f54ac4108c71f4a6cfb314f",
+                {
+                    center: [41.3851, 2.1734],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 13,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_c4e54ac08529a3a4406870725569ee01 = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 20,
+  "maxNativeZoom": 20,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
+  "subdomains": "abcd",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_c4e54ac08529a3a4406870725569ee01.addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+            var poly_line_2b5073a68208c6014d2f6c1b21c41157 = L.polyline(
+                [[41.40714187, 2.15001427], [41.40660044, 2.149430702], [41.40774166, 2.150673988], [41.40794658, 2.1509838], [41.4080645, 2.15121743], [41.4094265, 2.15495166], [41.4095282, 2.155139395], [41.41119087, 2.157617024]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+        var popup_6d19d01c7e14e490f3af693b20c8ecae = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_363cf665eb2731c648c3dba5bd686551 = $(`<div id="html_363cf665eb2731c648c3dba5bd686551" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0; color: #3498db;">Tram 233</h4>             <p style="margin: 5px 0;"><b>Travessera de Dalt (Pl. Lesseps a Escorial)</b></p>         </div>         </div>`)[0];
+                popup_6d19d01c7e14e490f3af693b20c8ecae.setContent(html_363cf665eb2731c648c3dba5bd686551);
+            
+        
+
+        poly_line_2b5073a68208c6014d2f6c1b21c41157.bindPopup(popup_6d19d01c7e14e490f3af693b20c8ecae)
+        ;
+
+        
+    
+    
+            poly_line_2b5073a68208c6014d2f6c1b21c41157.bindTooltip(
+                `<div>
+                     Tram 233
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_23206ae6b0b1eb6b67875f71c5dfe236 = L.polyline(
+                [[41.38599405, 2.163687051], [41.38825104, 2.166721381], [41.38835913, 2.167167098], [41.38932939, 2.168387596]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+        var popup_26f00a9ff7d93019f79e07de84127517 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_6ba3b6544b0a24623bafb8e79acc7000 = $(`<div id="html_6ba3b6544b0a24623bafb8e79acc7000" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0; color: #3498db;">Tram 158</h4>             <p style="margin: 5px 0;"><b>Gran Via (Pl. Universitat a Passeig de Gràcia)</b></p>         </div>         </div>`)[0];
+                popup_26f00a9ff7d93019f79e07de84127517.setContent(html_6ba3b6544b0a24623bafb8e79acc7000);
+            
+        
+
+        poly_line_23206ae6b0b1eb6b67875f71c5dfe236.bindPopup(popup_26f00a9ff7d93019f79e07de84127517)
+        ;
+
+        
+    
+    
+            poly_line_23206ae6b0b1eb6b67875f71c5dfe236.bindTooltip(
+                `<div>
+                     Tram 158
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_46f27ad537a34d6c9c66d2e67e054c7f = L.polyline(
+                [[41.39145862, 2.139348563], [41.39426088, 2.138167025]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+        var popup_45a430bb65d04268c6941b858c9a1406 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_f475b32b2e037b18a58e729df5c24283 = $(`<div id="html_f475b32b2e037b18a58e729df5c24283" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0; color: #3498db;">Tram 57</h4>             <p style="margin: 5px 0;"><b>Ganduxer (Diagonal a Pl. Gregori Tramaturg)</b></p>         </div>         </div>`)[0];
+                popup_45a430bb65d04268c6941b858c9a1406.setContent(html_f475b32b2e037b18a58e729df5c24283);
+            
+        
+
+        poly_line_46f27ad537a34d6c9c66d2e67e054c7f.bindPopup(popup_45a430bb65d04268c6941b858c9a1406)
+        ;
+
+        
+    
+    
+            poly_line_46f27ad537a34d6c9c66d2e67e054c7f.bindTooltip(
+                `<div>
+                     Tram 57
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_cc7f69e9609dde03b0f4cbdf67234835 = L.polyline(
+                [[41.41009709, 2.221378918], [41.40915624, 2.221022044], [41.40824019, 2.22042447], [41.4068194, 2.219016195], [41.40421698, 2.215541958], [41.40168939, 2.212090434]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+        var popup_961114b00e388bcec67b52ebae037fa1 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_70b3c32b634c453e9792a1e18bc8fb38 = $(`<div id="html_70b3c32b634c453e9792a1e18bc8fb38" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0; color: #3498db;">Tram 526</h4>             <p style="margin: 5px 0;"><b>Ronda del Litoral (Rambla de Prim a Bac de Roda)</b></p>         </div>         </div>`)[0];
+                popup_961114b00e388bcec67b52ebae037fa1.setContent(html_70b3c32b634c453e9792a1e18bc8fb38);
+            
+        
+
+        poly_line_cc7f69e9609dde03b0f4cbdf67234835.bindPopup(popup_961114b00e388bcec67b52ebae037fa1)
+        ;
+
+        
+    
+    
+            poly_line_cc7f69e9609dde03b0f4cbdf67234835.bindTooltip(
+                `<div>
+                     Tram 526
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_1f8fc5e8478696efee9586a58a4d2ea7 = L.polyline(
+                [[41.41246001, 2.139938976], [41.41181817, 2.140753869], [41.41174905, 2.141046301], [41.41148586, 2.143242121], [41.41135296, 2.144775905], [41.41131454, 2.144965492], [41.41119121, 2.145213817], [41.41082586, 2.145635969]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+        var popup_80a5110efcde3bef7a77653db29d3ab6 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_1b46b633fed899668cd19395e06996d3 = $(`<div id="html_1b46b633fed899668cd19395e06996d3" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0; color: #3498db;">Tram 83</h4>             <p style="margin: 5px 0;"><b>República Argentina (Craywinckel a Bolívar)</b></p>         </div>         </div>`)[0];
+                popup_80a5110efcde3bef7a77653db29d3ab6.setContent(html_1b46b633fed899668cd19395e06996d3);
+            
+        
+
+        poly_line_1f8fc5e8478696efee9586a58a4d2ea7.bindPopup(popup_80a5110efcde3bef7a77653db29d3ab6)
+        ;
+
+        
+    
+    
+            poly_line_1f8fc5e8478696efee9586a58a4d2ea7.bindTooltip(
+                `<div>
+                     Tram 83
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_e664d77560a9534281e34c53a31eef29 = L.polyline(
+                [[41.39270298, 2.129939242], [41.39576113, 2.125853122], [41.39582433, 2.125648229]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+        var popup_d169bd2b390f659457337c3ba4707124 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_96c58d14516f570a3da80586ba3a8c74 = $(`<div id="html_96c58d14516f570a3da80586ba3a8c74" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0; color: #3498db;">Tram 445</h4>             <p style="margin: 5px 0;"><b>P. Sant Joan Bosco (Pl. Prat de la Riba a Pl. Artós)</b></p>         </div>         </div>`)[0];
+                popup_d169bd2b390f659457337c3ba4707124.setContent(html_96c58d14516f570a3da80586ba3a8c74);
+            
+        
+
+        poly_line_e664d77560a9534281e34c53a31eef29.bindPopup(popup_d169bd2b390f659457337c3ba4707124)
+        ;
+
+        
+    
+    
+            poly_line_e664d77560a9534281e34c53a31eef29.bindTooltip(
+                `<div>
+                     Tram 445
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_af56bf84913eba5551ffc8e57596f15e = L.polyline(
+                [[41.38722369, 2.106107491], [41.38505715, 2.1104323], [41.38422627, 2.110724278]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+        var popup_333e0e67f853df8fbe513cb6435112d6 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_c448b2fd86a2723a89c60695818a8ead = $(`<div id="html_c448b2fd86a2723a89c60695818a8ead" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0; color: #3498db;">Tram 11</h4>             <p style="margin: 5px 0;"><b>González Tablas (Av. Esplugues a Av. Diagonal)</b></p>         </div>         </div>`)[0];
+                popup_333e0e67f853df8fbe513cb6435112d6.setContent(html_c448b2fd86a2723a89c60695818a8ead);
+            
+        
+
+        poly_line_af56bf84913eba5551ffc8e57596f15e.bindPopup(popup_333e0e67f853df8fbe513cb6435112d6)
+        ;
+
+        
+    
+    
+            poly_line_af56bf84913eba5551ffc8e57596f15e.bindTooltip(
+                `<div>
+                     Tram 11
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_9ec72724bab263d1e1d350a7cb52bb8a = L.polyline(
+                [[41.39858718, 2.118566628], [41.39798562, 2.119191648], [41.39791625, 2.119246441], [41.39748508, 2.119664065], [41.39707294, 2.12013568], [41.39692542, 2.120313579], [41.39675328, 2.120291728], [41.39661906, 2.120228563], [41.39645472, 2.120140817], [41.39618658, 2.12001334], [41.39584584, 2.119990863], [41.39564523, 2.120008438], [41.39533648, 2.120117375], [41.39505654, 2.120317233], [41.3939795, 2.121050153], [41.39334043, 2.121128564], [41.39289875, 2.121244024], [41.39271523, 2.12133094], [41.39213473, 2.121824067], [41.39185314, 2.122058909], [41.39135256, 2.122625786], [41.3909108, 2.123264853]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+        var popup_894d3219d6a919cda6115de1da9180f6 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_5adb2dcd82416fa9ecdd63eb4c4ddac7 = $(`<div id="html_5adb2dcd82416fa9ecdd63eb4c4ddac7" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0; color: #3498db;">Tram 22</h4>             <p style="margin: 5px 0;"><b>Av. Foix (Pg. Reina Elisenda a Pg. Manuel Girona)</b></p>         </div>         </div>`)[0];
+                popup_894d3219d6a919cda6115de1da9180f6.setContent(html_5adb2dcd82416fa9ecdd63eb4c4ddac7);
+            
+        
+
+        poly_line_9ec72724bab263d1e1d350a7cb52bb8a.bindPopup(popup_894d3219d6a919cda6115de1da9180f6)
+        ;
+
+        
+    
+    
+            poly_line_9ec72724bab263d1e1d350a7cb52bb8a.bindTooltip(
+                `<div>
+                     Tram 22
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_5f9d424e66141cb444d42e37bb84146f = L.polyline(
+                [[41.41067593, 2.158209563], [41.41110907, 2.159306708], [41.41183451, 2.160519322], [41.41263573, 2.162078414], [41.41349106, 2.163507603], [41.41493103, 2.16643829]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+        var popup_85dfb59031eaa841daa335d292a1a894 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_0ff9562f6059137510d36c552923bf81 = $(`<div id="html_0ff9562f6059137510d36c552923bf81" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0; color: #3498db;">Tram 460</h4>             <p style="margin: 5px 0;"><b>Camèlies (Escorial a Pl. de la Font Castellana)</b></p>         </div>         </div>`)[0];
+                popup_85dfb59031eaa841daa335d292a1a894.setContent(html_0ff9562f6059137510d36c552923bf81);
+            
+        
+
+        poly_line_5f9d424e66141cb444d42e37bb84146f.bindPopup(popup_85dfb59031eaa841daa335d292a1a894)
+        ;
+
+        
+    
+    
+            poly_line_5f9d424e66141cb444d42e37bb84146f.bindTooltip(
+                `<div>
+                     Tram 460
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_2e4a7a67b37c78618f449e5728894935 = L.polyline(
+                [[41.38847781, 2.172796098], [41.3872706, 2.171738382], [41.38694748, 2.171374536]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+        var popup_53361a7d94b47197a0e2de3fa196b30f = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_b7ab273542dfbbd0f1f13ee6afd37bb0 = $(`<div id="html_b7ab273542dfbbd0f1f13ee6afd37bb0" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0; color: #3498db;">Tram 178</h4>             <p style="margin: 5px 0;"><b>Fontanella (Pl. Catalunya a Pl. Urquinaona)</b></p>         </div>         </div>`)[0];
+                popup_53361a7d94b47197a0e2de3fa196b30f.setContent(html_b7ab273542dfbbd0f1f13ee6afd37bb0);
+            
+        
+
+        poly_line_2e4a7a67b37c78618f449e5728894935.bindPopup(popup_53361a7d94b47197a0e2de3fa196b30f)
+        ;
+
+        
+    
+    
+            poly_line_2e4a7a67b37c78618f449e5728894935.bindTooltip(
+                `<div>
+                     Tram 178
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_e289fbe7b07bdb956462eab29fe3143a = L.polyline(
+                [[41.39086967, 2.141323596], [41.39047484, 2.141144886], [41.39025064, 2.140958511], [41.38905207, 2.138911795]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+        var popup_9a07b67b5599f12673d0019e120616b3 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_e634db9f25470bcff07c33a2008cea09 = $(`<div id="html_e634db9f25470bcff07c33a2008cea09" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0; color: #3498db;">Tram 126</h4>             <p style="margin: 5px 0;"><b>Travessera de les Corts (Av. Sarrià a Entença)</b></p>         </div>         </div>`)[0];
+                popup_9a07b67b5599f12673d0019e120616b3.setContent(html_e634db9f25470bcff07c33a2008cea09);
+            
+        
+
+        poly_line_e289fbe7b07bdb956462eab29fe3143a.bindPopup(popup_9a07b67b5599f12673d0019e120616b3)
+        ;
+
+        
+    
+    
+            poly_line_e289fbe7b07bdb956462eab29fe3143a.bindTooltip(
+                `<div>
+                     Tram 126
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_cfb2e5ff43303cedb9f15f96072f79d3 = L.polyline(
+                [[41.44356616, 2.206062334], [41.44804289, 2.201961947], [41.44881362, 2.200663089], [41.44949307, 2.197777924], [41.44990657, 2.196633558]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+        var popup_6c3628d4d7423456f9c5e8bf5585992e = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_198f93eab8b15df6dd2401f679a9ee64 = $(`<div id="html_198f93eab8b15df6dd2401f679a9ee64" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0; color: #3498db;">Tram 534</h4>             <p style="margin: 5px 0;"><b>Ronda Litoral (Nus de la Trinitat a Potosí)</b></p>         </div>         </div>`)[0];
+                popup_6c3628d4d7423456f9c5e8bf5585992e.setContent(html_198f93eab8b15df6dd2401f679a9ee64);
+            
+        
+
+        poly_line_cfb2e5ff43303cedb9f15f96072f79d3.bindPopup(popup_6c3628d4d7423456f9c5e8bf5585992e)
+        ;
+
+        
+    
+    
+            poly_line_cfb2e5ff43303cedb9f15f96072f79d3.bindTooltip(
+                `<div>
+                     Tram 534
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_4b39ea7a16a4a1e74d2f8f7c380ccb9a = L.polyline(
+                [[41.3750483, 2.154014989], [41.37505541, 2.160795036]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+        var popup_d45785ace56015722c938851b0ea28dc = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_493072ee2f25e3d9f4fe69c6ec7c1e53 = $(`<div id="html_493072ee2f25e3d9f4fe69c6ec7c1e53" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0; color: #3498db;">Tram 164</h4>             <p style="margin: 5px 0;"><b>Paral.lel (Entença a Calàbria)</b></p>         </div>         </div>`)[0];
+                popup_d45785ace56015722c938851b0ea28dc.setContent(html_493072ee2f25e3d9f4fe69c6ec7c1e53);
+            
+        
+
+        poly_line_4b39ea7a16a4a1e74d2f8f7c380ccb9a.bindPopup(popup_d45785ace56015722c938851b0ea28dc)
+        ;
+
+        
+    
+    
+            poly_line_4b39ea7a16a4a1e74d2f8f7c380ccb9a.bindTooltip(
+                `<div>
+                     Tram 164
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_b8a9a13970af738f264a5b66d694584b = L.polyline(
+                [[41.38232376, 2.128083706], [41.37942131, 2.129033221], [41.37691309, 2.12986699], [41.37552345, 2.130308607]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+        var popup_926001f534639cb6a02f32764ab4ce04 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_42b151aaca295007e57dd2cf7e6b00b7 = $(`<div id="html_42b151aaca295007e57dd2cf7e6b00b7" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0; color: #3498db;">Tram 50</h4>             <p style="margin: 5px 0;"><b>Carles III (Travessera de les Corts a Carrer de Sans)</b></p>         </div>         </div>`)[0];
+                popup_926001f534639cb6a02f32764ab4ce04.setContent(html_42b151aaca295007e57dd2cf7e6b00b7);
+            
+        
+
+        poly_line_b8a9a13970af738f264a5b66d694584b.bindPopup(popup_926001f534639cb6a02f32764ab4ce04)
+        ;
+
+        
+    
+    
+            poly_line_b8a9a13970af738f264a5b66d694584b.bindTooltip(
+                `<div>
+                     Tram 50
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_b3e53106864c07d6888c8887d2399165 = L.polyline(
+                [[41.39912149, 2.181206101], [41.40096789, 2.183673334], [41.40105872, 2.183874961], [41.40204729, 2.185215196], [41.40212063, 2.185364711], [41.40217895, 2.185493961], [41.40227214, 2.185711075], [41.40232972, 2.185999503], [41.40237811, 2.18633559], [41.40244685, 2.186767277], [41.40249461, 2.187028199], [41.40258718, 2.18722498], [41.40274181, 2.18754202], [41.40282749, 2.187646522]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+        var popup_54818b389eaea1c9c7f14a4bf0ab2e0a = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_fe09e489cbaf2d4e38e7b198c5f282fb = $(`<div id="html_fe09e489cbaf2d4e38e7b198c5f282fb" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0; color: #3498db;">Tram 278</h4>             <p style="margin: 5px 0;"><b>Gran Via (Marina a Pl de les Glòries)</b></p>         </div>         </div>`)[0];
+                popup_54818b389eaea1c9c7f14a4bf0ab2e0a.setContent(html_fe09e489cbaf2d4e38e7b198c5f282fb);
+            
+        
+
+        poly_line_b3e53106864c07d6888c8887d2399165.bindPopup(popup_54818b389eaea1c9c7f14a4bf0ab2e0a)
+        ;
+
+        
+    
+    
+            poly_line_b3e53106864c07d6888c8887d2399165.bindTooltip(
+                `<div>
+                     Tram 278
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_28cd238d36709e2e4120ef8190e6c8af = L.polyline(
+                [[41.39669542, 2.170928778], [41.39405543, 2.174408676]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+        var popup_f976a351c7e15bb2c5a7a20b5809904e = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_13bcfc037c751aa7095d56c68c9c3c20 = $(`<div id="html_13bcfc037c751aa7095d56c68c9c3c20" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0; color: #3498db;">Tram 388</h4>             <p style="margin: 5px 0;"><b>Bailén (Aragó a Gran Via)</b></p>         </div>         </div>`)[0];
+                popup_f976a351c7e15bb2c5a7a20b5809904e.setContent(html_13bcfc037c751aa7095d56c68c9c3c20);
+            
+        
+
+        poly_line_28cd238d36709e2e4120ef8190e6c8af.bindPopup(popup_f976a351c7e15bb2c5a7a20b5809904e)
+        ;
+
+        
+    
+    
+            poly_line_28cd238d36709e2e4120ef8190e6c8af.bindTooltip(
+                `<div>
+                     Tram 388
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_9f6bacbf2fd791412396aba1bd02bf3e = L.polyline(
+                [[41.38786552, 2.19579478], [41.38555373, 2.192638242], [41.38527511, 2.192117511], [41.38484861, 2.191358825], [41.38416702, 2.190007487], [41.38278001, 2.187000035], [41.38219047, 2.185750566], [41.38201049, 2.185170928], [41.38159448, 2.184628719], [41.38147103, 2.184448989], [41.38127507, 2.183942563], [41.3811418, 2.183339272], [41.3811381, 2.182701345], [41.38126845, 2.182403227]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+        var popup_3a03cd25ae8cf41b1b33ecc295a9ebe5 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_31680f284878141d986b63c9c8db9df0 = $(`<div id="html_31680f284878141d986b63c9c8db9df0" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0; color: #3498db;">Tram 478</h4>             <p style="margin: 5px 0;"><b>Dr. Aiguader (Pl. Voluntaris a Pl. Antonio López)</b></p>         </div>         </div>`)[0];
+                popup_3a03cd25ae8cf41b1b33ecc295a9ebe5.setContent(html_31680f284878141d986b63c9c8db9df0);
+            
+        
+
+        poly_line_9f6bacbf2fd791412396aba1bd02bf3e.bindPopup(popup_3a03cd25ae8cf41b1b33ecc295a9ebe5)
+        ;
+
+        
+    
+    
+            poly_line_9f6bacbf2fd791412396aba1bd02bf3e.bindTooltip(
+                `<div>
+                     Tram 478
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_67cefc4f818ab94b8cacc5eb53008b4b = L.polyline(
+                [[41.41464991, 2.194578848], [41.40875903, 2.186880559]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+        var popup_5c28c2bbf4c54af276fd2d12b0231790 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_a78d99b389e94d94044a3a0bad16595c = $(`<div id="html_a78d99b389e94d94044a3a0bad16595c" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0; color: #3498db;">Tram 270</h4>             <p style="margin: 5px 0;"><b>Guipúscoa (Bac de Roda a Meridiana)</b></p>         </div>         </div>`)[0];
+                popup_5c28c2bbf4c54af276fd2d12b0231790.setContent(html_a78d99b389e94d94044a3a0bad16595c);
+            
+        
+
+        poly_line_67cefc4f818ab94b8cacc5eb53008b4b.bindPopup(popup_5c28c2bbf4c54af276fd2d12b0231790)
+        ;
+
+        
+    
+    
+            poly_line_67cefc4f818ab94b8cacc5eb53008b4b.bindTooltip(
+                `<div>
+                     Tram 270
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_180e98ce0eb64ce06ba4d4dc1d37874a = L.polyline(
+                [[41.43400639, 2.192272336], [41.43517201, 2.191815278], [41.43648661, 2.191257612], [41.44529881, 2.190633691]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+        var popup_f6c196e21a0eb2ec5141dab30cc08fb7 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_771d0deb545a99b1bce74f3b7213c1be = $(`<div id="html_771d0deb545a99b1bce74f3b7213c1be" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0; color: #3498db;">Tram 332</h4>             <p style="margin: 5px 0;"><b>Passeig de Torras i Bages (Sant Adrià a Passeig Santa Coloma)</b></p>         </div>         </div>`)[0];
+                popup_f6c196e21a0eb2ec5141dab30cc08fb7.setContent(html_771d0deb545a99b1bce74f3b7213c1be);
+            
+        
+
+        poly_line_180e98ce0eb64ce06ba4d4dc1d37874a.bindPopup(popup_f6c196e21a0eb2ec5141dab30cc08fb7)
+        ;
+
+        
+    
+    
+            poly_line_180e98ce0eb64ce06ba4d4dc1d37874a.bindTooltip(
+                `<div>
+                     Tram 332
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_f515deb0e3c832d004f6564e7e6c9377 = L.polyline(
+                [[41.39757867, 2.162943661], [41.40085492, 2.167368795]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+        var popup_9bd665e47349eb35c600dc020dd2ff86 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_ba8e83fdcf30d1caee99045a98fc9766 = $(`<div id="html_ba8e83fdcf30d1caee99045a98fc9766" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0; color: #3498db;">Tram 254</h4>             <p style="margin: 5px 0;"><b>Rosselló (Diagonal a Passeig de Sant Joan)</b></p>         </div>         </div>`)[0];
+                popup_9bd665e47349eb35c600dc020dd2ff86.setContent(html_ba8e83fdcf30d1caee99045a98fc9766);
+            
+        
+
+        poly_line_f515deb0e3c832d004f6564e7e6c9377.bindPopup(popup_9bd665e47349eb35c600dc020dd2ff86)
+        ;
+
+        
+    
+    
+            poly_line_f515deb0e3c832d004f6564e7e6c9377.bindTooltip(
+                `<div>
+                     Tram 254
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_0a848aac763aa98aae886b473da7bef6 = L.polyline(
+                [[41.41245582, 2.167845191], [41.41260139, 2.167855634], [41.412753, 2.167762695], [41.41282101, 2.167659604], [41.41305546, 2.167326189], [41.41323785, 2.167100201], [41.41354945, 2.166846845], [41.4140104, 2.166392927], [41.41422113, 2.1662309], [41.41547893, 2.16547971], [41.41617729, 2.164985047], [41.41669795, 2.164548048], [41.41707678, 2.164125558], [41.41724981, 2.163904001], [41.41737641, 2.163788421], [41.41759532, 2.163560411], [41.41777265, 2.163378873], [41.41801341, 2.163107749], [41.41827815, 2.16280246], [41.41882137, 2.162103383], [41.41974463, 2.161052429], [41.42020313, 2.160510155], [41.42059969, 2.16020566], [41.42165229, 2.159340403], [41.42252508, 2.158845643], [41.42368521, 2.158462032]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+        var popup_762a3edf3c008f8a89166245d25c8d88 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_0d3f9ede34109acc58aaf75e4387c81c = $(`<div id="html_0d3f9ede34109acc58aaf75e4387c81c" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0; color: #3498db;">Tram 224</h4>             <p style="margin: 5px 0;"><b>Túnel de la Rovira (Ronda Guinardó a Rambla del Carmel)</b></p>         </div>         </div>`)[0];
+                popup_762a3edf3c008f8a89166245d25c8d88.setContent(html_0d3f9ede34109acc58aaf75e4387c81c);
+            
+        
+
+        poly_line_0a848aac763aa98aae886b473da7bef6.bindPopup(popup_762a3edf3c008f8a89166245d25c8d88)
+        ;
+
+        
+    
+    
+            poly_line_0a848aac763aa98aae886b473da7bef6.bindTooltip(
+                `<div>
+                     Tram 224
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_1d4f0b422f364ba598b27cf2b1ba256f = L.polyline(
+                [[41.38125184, 2.182329274], [41.38258263, 2.183398224], [41.38268817, 2.18356088], [41.3827825, 2.183649596], [41.38292674, 2.183767906], [41.38305989, 2.183804898], [41.38537281, 2.185727426], [41.38547533, 2.185762661], [41.38556898, 2.18584341]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+        var popup_cf17e6dfb422b768049158b1921002b3 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_ff57990285994f9323a2310e2a1b7b1b = $(`<div id="html_ff57990285994f9323a2310e2a1b7b1b" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0; color: #3498db;">Tram 293</h4>             <p style="margin: 5px 0;"><b>Av. Marqués de l'Argentera (Pl. Antonio López a Passeig de Picasso)</b></p>         </div>         </div>`)[0];
+                popup_cf17e6dfb422b768049158b1921002b3.setContent(html_ff57990285994f9323a2310e2a1b7b1b);
+            
+        
+
+        poly_line_1d4f0b422f364ba598b27cf2b1ba256f.bindPopup(popup_cf17e6dfb422b768049158b1921002b3)
+        ;
+
+        
+    
+    
+            poly_line_1d4f0b422f364ba598b27cf2b1ba256f.bindTooltip(
+                `<div>
+                     Tram 293
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_a07d99a5d68f278d3a06f952b6bec0d0 = L.polyline(
+                [[41.38216041, 2.158536123], [41.3848054, 2.155073626]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+        var popup_05575ae599b56dd0ef9d6c71285fb4c1 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_f761ceee14280bf5a376368a699166a1 = $(`<div id="html_f761ceee14280bf5a376368a699166a1" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0; color: #3498db;">Tram 117</h4>             <p style="margin: 5px 0;"><b>Urgell (Gran Via a Aragó)</b></p>         </div>         </div>`)[0];
+                popup_05575ae599b56dd0ef9d6c71285fb4c1.setContent(html_f761ceee14280bf5a376368a699166a1);
+            
+        
+
+        poly_line_a07d99a5d68f278d3a06f952b6bec0d0.bindPopup(popup_05575ae599b56dd0ef9d6c71285fb4c1)
+        ;
+
+        
+    
+    
+            poly_line_a07d99a5d68f278d3a06f952b6bec0d0.bindTooltip(
+                `<div>
+                     Tram 117
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_b0e0ea6ba95677e9f139bb74539bc915 = L.polyline(
+                [[41.40448234, 2.140648117], [41.40488849, 2.141663268], [41.405085, 2.142348458], [41.40549406, 2.144045398], [41.40554996, 2.144408409], [41.40571898, 2.145461627], [41.40587709, 2.147306321], [41.40590631, 2.1475982], [41.40599817, 2.148089552], [41.40624562, 2.148641293], [41.40663804, 2.149276333]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+        var popup_5394a7a576373451ad7177b2cf80969e = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_f2bc52741431dd8ec745558028c91e22 = $(`<div id="html_f2bc52741431dd8ec745558028c91e22" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0; color: #3498db;">Tram 100</h4>             <p style="margin: 5px 0;"><b>Mitre (Pl. Lesseps a Balmes)</b></p>         </div>         </div>`)[0];
+                popup_5394a7a576373451ad7177b2cf80969e.setContent(html_f2bc52741431dd8ec745558028c91e22);
+            
+        
+
+        poly_line_b0e0ea6ba95677e9f139bb74539bc915.bindPopup(popup_5394a7a576373451ad7177b2cf80969e)
+        ;
+
+        
+    
+    
+            poly_line_b0e0ea6ba95677e9f139bb74539bc915.bindTooltip(
+                `<div>
+                     Tram 100
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_5415c01c33a0cecac161bd8faded20e8 = L.polyline(
+                [[41.39293571, 2.14509224], [41.39534965, 2.154615812]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+        var popup_64c784976f30e0d5f9a34c3510efab88 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_073ffda2fa5a2a7da33de8dd784c5b01 = $(`<div id="html_073ffda2fa5a2a7da33de8dd784c5b01" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0; color: #3498db;">Tram 104</h4>             <p style="margin: 5px 0;"><b>Diagonal (Balmes a Pl. Francesc Macià)</b></p>         </div>         </div>`)[0];
+                popup_64c784976f30e0d5f9a34c3510efab88.setContent(html_073ffda2fa5a2a7da33de8dd784c5b01);
+            
+        
+
+        poly_line_5415c01c33a0cecac161bd8faded20e8.bindPopup(popup_64c784976f30e0d5f9a34c3510efab88)
+        ;
+
+        
+    
+    
+            poly_line_5415c01c33a0cecac161bd8faded20e8.bindTooltip(
+                `<div>
+                     Tram 104
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_4c5dd4b2a77447284d7695794511b689 = L.polyline(
+                [[41.37107648, 2.173843461], [41.37323709, 2.1755476], [41.37347141, 2.17563805], [41.37362491, 2.175583009], [41.37374016, 2.175499811], [41.3739728, 2.175539749], [41.37408609, 2.175618596]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+        var popup_4b3bdb812c9a8bcea26b80ee2f0c4d40 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_8a3d79316f63c339730935c251a76395 = $(`<div id="html_8a3d79316f63c339730935c251a76395" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0; color: #3498db;">Tram 409</h4>             <p style="margin: 5px 0;"><b>Josep Carner (Av. Paral.lel a Miramar)</b></p>         </div>         </div>`)[0];
+                popup_4b3bdb812c9a8bcea26b80ee2f0c4d40.setContent(html_8a3d79316f63c339730935c251a76395);
+            
+        
+
+        poly_line_4c5dd4b2a77447284d7695794511b689.bindPopup(popup_4b3bdb812c9a8bcea26b80ee2f0c4d40)
+        ;
+
+        
+    
+    
+            poly_line_4c5dd4b2a77447284d7695794511b689.bindTooltip(
+                `<div>
+                     Tram 409
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_bd2ddd629c027cf4a50be28898769f81 = L.polyline(
+                [[41.37800864, 2.121450387], [41.37831135, 2.121179403], [41.37849465, 2.120974517], [41.37878632, 2.120563597], [41.37906071, 2.120112466], [41.37924751, 2.119740279], [41.37940299, 2.119555246], [41.37961527, 2.119383082], [41.37980697, 2.119243133], [41.38006333, 2.119133449], [41.38031026, 2.119082037], [41.38068859, 2.119052996]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+        var popup_a3d298f6cd8a2fc4ac34d8ca248e10a9 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_26a0eecb950a8789a171da6685a703ae = $(`<div id="html_26a0eecb950a8789a171da6685a703ae" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0; color: #3498db;">Tram 31</h4>             <p style="margin: 5px 0;"><b>Aristides Maillol (Travessera de les Corts a Av. Doctor Marañón)</b></p>         </div>         </div>`)[0];
+                popup_a3d298f6cd8a2fc4ac34d8ca248e10a9.setContent(html_26a0eecb950a8789a171da6685a703ae);
+            
+        
+
+        poly_line_bd2ddd629c027cf4a50be28898769f81.bindPopup(popup_a3d298f6cd8a2fc4ac34d8ca248e10a9)
+        ;
+
+        
+    
+    
+            poly_line_bd2ddd629c027cf4a50be28898769f81.bindTooltip(
+                `<div>
+                     Tram 31
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_b39e4206ab764af70dbc6c2725590d89 = L.polyline(
+                [[41.42901976, 2.156953106], [41.42871902, 2.157155868], [41.42834303, 2.157324707], [41.42791996, 2.157454899], [41.42755743, 2.157530432], [41.42728126, 2.157574907], [41.42710813, 2.157491196], [41.42696055, 2.157419147], [41.42680202, 2.15743007], [41.42630904, 2.157553497], [41.42519761, 2.157757764], [41.42496793, 2.157784089], [41.42482789, 2.15776506], [41.42472671, 2.157788959], [41.42410677, 2.157943437], [41.4236765, 2.158024214]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+        var popup_a9447f60b05d3944bd517f0a54834521 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_dd8a5fd35aa770aef64642040535821a = $(`<div id="html_dd8a5fd35aa770aef64642040535821a" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0; color: #3498db;">Tram 221</h4>             <p style="margin: 5px 0;"><b>Rambla del Carmel (Lisboa a Túnel de la Rovira)</b></p>         </div>         </div>`)[0];
+                popup_a9447f60b05d3944bd517f0a54834521.setContent(html_dd8a5fd35aa770aef64642040535821a);
+            
+        
+
+        poly_line_b39e4206ab764af70dbc6c2725590d89.bindPopup(popup_a9447f60b05d3944bd517f0a54834521)
+        ;
+
+        
+    
+    
+            poly_line_b39e4206ab764af70dbc6c2725590d89.bindTooltip(
+                `<div>
+                     Tram 221
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_9eccdd8ce7ac7fa82806c39acad2e7b7 = L.polyline(
+                [[41.41162175, 2.219348436], [41.41880434, 2.209650032], [41.41961806, 2.209076089]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+        var popup_56e7a35dea958281f441cc243efa806a = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_2f81765806eed321076065cafac09dd7 = $(`<div id="html_2f81765806eed321076065cafac09dd7" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0; color: #3498db;">Tram 360</h4>             <p style="margin: 5px 0;"><b>Rambla Prim (Pl. Llevant a Gran Via)</b></p>         </div>         </div>`)[0];
+                popup_56e7a35dea958281f441cc243efa806a.setContent(html_2f81765806eed321076065cafac09dd7);
+            
+        
+
+        poly_line_9eccdd8ce7ac7fa82806c39acad2e7b7.bindPopup(popup_56e7a35dea958281f441cc243efa806a)
+        ;
+
+        
+    
+    
+            poly_line_9eccdd8ce7ac7fa82806c39acad2e7b7.bindTooltip(
+                `<div>
+                     Tram 360
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_2db1050d2c08a47fb8e6f326aed7046b = L.polyline(
+                [[41.38292, 2.16208], [41.38329, 2.16159], [41.38372, 2.161], [41.38381, 2.16088]],
+                {"bubblingMouseEvents": true, "color": "#3498db", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3498db", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+        
+    
+        var popup_4f264cd8ae719e7116b32ba5db2df0ed = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_d8792c7b5fa2f20f81bc632434b8d50b = $(`<div id="html_d8792c7b5fa2f20f81bc632434b8d50b" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0; color: #3498db;">Tram 303</h4>             <p style="margin: 5px 0;"><b>Casanova (Rda. Sant Antoni a Gran Via)</b></p>         </div>         </div>`)[0];
+                popup_4f264cd8ae719e7116b32ba5db2df0ed.setContent(html_d8792c7b5fa2f20f81bc632434b8d50b);
+            
+        
+
+        poly_line_2db1050d2c08a47fb8e6f326aed7046b.bindPopup(popup_4f264cd8ae719e7116b32ba5db2df0ed)
+        ;
+
+        
+    
+    
+            poly_line_2db1050d2c08a47fb8e6f326aed7046b.bindTooltip(
+                `<div>
+                     Tram 303
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var layer_control_ab9ada251aed015629e1add7fce2c5a8_layers = {
+                base_layers : {
+                    "cartodbpositron" : tile_layer_c4e54ac08529a3a4406870725569ee01,
+                },
+                overlays :  {
+                },
+            };
+            let layer_control_ab9ada251aed015629e1add7fce2c5a8 = L.control.layers(
+                layer_control_ab9ada251aed015629e1add7fce2c5a8_layers.base_layers,
+                layer_control_ab9ada251aed015629e1add7fce2c5a8_layers.overlays,
+                {
+  "position": "topright",
+  "collapsed": true,
+  "autoZIndex": true,
+}
+            ).addTo(map_5c06e0961f54ac4108c71f4a6cfb314f);
+
+        
+</script>
+</html>

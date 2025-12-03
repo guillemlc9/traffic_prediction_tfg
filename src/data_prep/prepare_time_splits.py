@@ -46,16 +46,16 @@ def get_temporal_splits(df: pl.DataFrame) -> Dict[str, datetime]:
             'test_end': datetime
         }
     """
-    # Obtenir rang temporal complet
+    # Rang temporal complet
     start_date = df['timestamp'].min()
     end_date = df['timestamp'].max()
     
-    # Calcular durada total
+    # Durada total
     total_duration = end_date - start_date
     
-    # Calcular punts de tall
+    # Punts de tall
     train_end = start_date + total_duration * 0.75
-    val_end = start_date + total_duration * 0.85  # 75% + 10%
+    val_end = start_date + total_duration * 0.85
     
     splits = {
         'train_start': start_date,
@@ -153,7 +153,7 @@ def get_all_trams_data(
     if tram_ids is None:
         tram_ids = SELECTED_TRAMS
     
-    # Calcular splits una sola vegada
+    # Splits
     splits_info = get_temporal_splits(df)
     
     # Filtrar dataset pels trams seleccionats
@@ -220,7 +220,7 @@ def main():
     print(f"Carregant dades de {DATA_PATH}...")
     df = pl.read_parquet(DATA_PATH)
     
-    # Obtenir informació dels splits
+    # Informació dels splits
     splits_info = get_temporal_splits(df)
     print_splits_summary(splits_info)
     

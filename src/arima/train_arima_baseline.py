@@ -118,7 +118,7 @@ def save_model(model, tram_id: int, order: tuple, models_dir: str = MODELS_DIR) 
     """
     Path(models_dir).mkdir(parents=True, exist_ok=True)
 
-    # Guardar només informació essencial
+    # Guardem només informació essencial
     lightweight = {
         "params": model.params,
         "bse": model.bse,
@@ -229,7 +229,7 @@ def train_all_models(
         result['train_start'] = splits_info['train_start']
         result['train_end'] = splits_info['train_end']
         
-        # No guardem el model al DataFrame (massa gran)
+        # No guardem el model al DataFrame
         result_without_model = {k: v for k, v in result.items() if k != 'model'}
         results.append(result_without_model)
     
