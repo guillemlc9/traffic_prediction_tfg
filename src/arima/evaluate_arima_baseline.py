@@ -23,6 +23,7 @@ warnings.filterwarnings('ignore')
 import matplotlib.pyplot as plt
 import seaborn as sns
 import openpyxl
+from sklearn.metrics import confusion_matrix
 
 from statsmodels.tsa.arima.model import ARIMA
 from src.data_prep.prepare_time_splits import (
@@ -376,6 +377,138 @@ def create_visualizations(metrics_df: pl.DataFrame, split: str = 'test'):
     print("\nVisualitzacions completades!")
 
 
+def create_confusion_matrix(split: str = 'test'):
+    """
+    Crea una matriu de confusió per visualitzar la relació entre valors reals (1-5)
+    i prediccions arrodonides (1-5).
+    
+    Aquesta visualització permet veure clarament si els errors es concentren
+    a la diagonal (encerts) o a les cel·les veïnes (error de ±1).
+    
+    Parameters
+    ----------
+    split : str
+        Split a avaluar: 'val' o 'test'
+    """
+    print("\n" + "=" * 60)
+    print(f"GENERANT MATRIU DE CONFUSIÓ - Split: {split.upper()}")
+    print("=" * 60)
+    
+    # Carregar dades
+    df = pl.read_parquet(DATA_PATH)
+    splits_info = get_temporal_splits(df)
+    
+    # Llistes per acumular tots els valors reals i prediccions
+    all_y_true = []
+    all_y_pred = []
+    
+    # Iterar sobre tots els trams
+    for i, tram_id in enumerate(SELECTED_TRAMS, 1):
+        print(f"[{i}/{len(SELECTED_TRAMS)}] Processant Tram {tram_id}...", end='\r')
+        
+        try:
+            # Carregar paràmetres del model
+            model_params = load_model_params(tram_id)
+            order = model_params['order']
+            
+            # Obtenir dades
+            train_data = prepare_tram_series(df, tram_id, 'train', splits_info)
+            test_data = prepare_tram_series(df, tram_id, split, splits_info)
+            
+            train_series = train_data['estatActual']
+            test_series = test_data['estatActual']
+            
+            # Fer prediccions
+            predictions = make_predictions(train_series, test_series, order)
+            
+            # Acumular valors reals i prediccions
+            all_y_true.extend(test_series.values)
+            all_y_pred.extend(predictions)
+            
+        except Exception as e:
+            print(f"\n  ✗ Error en Tram {tram_id}: {e}")
+            continue
+    
+    print(f"\n\nTotal de prediccions: {len(all_y_true)}")
+    
+    # Convertir a arrays numpy
+    all_y_true = np.array(all_y_true)
+    all_y_pred = np.array(all_y_pred)
+    
+    # Arrodonir prediccions i assegurar que estan en el rang [1, 5]
+    all_y_pred_rounded = np.clip(np.round(all_y_pred), 1, 5).astype(int)
+    all_y_true_int = np.clip(np.round(all_y_true), 1, 5).astype(int)
+    
+    # Calcular matriu de confusió
+    cm = confusion_matrix(all_y_true_int, all_y_pred_rounded, labels=[1, 2, 3, 4, 5])
+    
+    # Calcular percentatges per fila (normalitzar per valors reals)
+    cm_percent = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis] * 100
+    
+    # Crear figura amb dues matrius: valors absoluts i percentatges
+    fig, axes = plt.subplots(1, 2, figsize=(18, 7))
+    
+    # 1. Matriu de confusió amb valors absoluts
+    ax1 = axes[0]
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', 
+                xticklabels=[1, 2, 3, 4, 5], 
+                yticklabels=[1, 2, 3, 4, 5],
+                cbar_kws={'label': 'Nombre de prediccions'},
+                ax=ax1, linewidths=0.5, linecolor='gray')
+    ax1.set_xlabel('Predicció Arrodonida', fontsize=12, fontweight='bold')
+    ax1.set_ylabel('Valor Real (estatActual)', fontsize=12, fontweight='bold')
+    ax1.set_title(f'Matriu de Confusió - Valors Absoluts\nSplit: {split.upper()}', 
+                  fontsize=14, fontweight='bold')
+    
+    # 2. Matriu de confusió amb percentatges
+    ax2 = axes[1]
+    sns.heatmap(cm_percent, annot=True, fmt='.1f', cmap='Greens', 
+                xticklabels=[1, 2, 3, 4, 5], 
+                yticklabels=[1, 2, 3, 4, 5],
+                cbar_kws={'label': 'Percentatge (%)'},
+                ax=ax2, linewidths=0.5, linecolor='gray')
+    ax2.set_xlabel('Predicció Arrodonida', fontsize=12, fontweight='bold')
+    ax2.set_ylabel('Valor Real (estatActual)', fontsize=12, fontweight='bold')
+    ax2.set_title(f'Matriu de Confusió - Percentatges per Fila\nSplit: {split.upper()}', 
+                  fontsize=14, fontweight='bold')
+    
+    plt.tight_layout()
+    
+    # Guardar figura
+    output_path = f"{OUTPUT_PLOTS_DIR}/confusion_matrix_{split}.png"
+    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    print(f"\n✓ Matriu de confusió guardada: {output_path}")
+    
+    plt.close()
+    
+    # Calcular i mostrar estadístiques sobre la diagonal
+    diagonal_sum = np.trace(cm)
+    near_diagonal_sum = 0
+    for i in range(5):
+        for j in range(5):
+            if abs(i - j) == 1:  # Cel·les veïnes
+                near_diagonal_sum += cm[i, j]
+    
+    total_predictions = cm.sum()
+    diagonal_percent = (diagonal_sum / total_predictions) * 100
+    near_diagonal_percent = (near_diagonal_sum / total_predictions) * 100
+    far_errors_percent = 100 - diagonal_percent - near_diagonal_percent
+    
+    print("\n" + "=" * 60)
+    print("ANÀLISI DE LA MATRIU DE CONFUSIÓ")
+    print("=" * 60)
+    print(f"\nPrediccions exactes (diagonal): {diagonal_sum} ({diagonal_percent:.2f}%)")
+    print(f"Errors de ±1 (cel·les veïnes): {near_diagonal_sum} ({near_diagonal_percent:.2f}%)")
+    print(f"Errors llunyans (±2 o més): {total_predictions - diagonal_sum - near_diagonal_sum} ({far_errors_percent:.2f}%)")
+    print(f"\nTotal prediccions: {total_predictions}")
+    
+    # Calcular MAE per validar
+    mae = np.mean(np.abs(all_y_true - all_y_pred))
+    print(f"\nMAE global: {mae:.4f}")
+    
+    print("\nMatriu de confusió completada!")
+
+
 def main():
     """
     Funció principal per avaluar els models baseline.
@@ -390,6 +523,9 @@ def main():
     # Crear visualitzacions
     create_visualizations(metrics_test, split='test')
     
+    # Crear matriu de confusió per TEST
+    create_confusion_matrix(split='test')
+    
     # Avaluem sobre Val
     print("\n\n" + "=" * 60)
     print("Avaluant models sobre el conjunt de VALIDACIÓ...")
@@ -400,8 +536,12 @@ def main():
     
     create_visualizations(metrics_val, split='val')
     
+    # Crear matriu de confusió per VAL
+    create_confusion_matrix(split='val')
+    
     return metrics_test, metrics_val
 
 
 if __name__ == "__main__":
     main()
+
