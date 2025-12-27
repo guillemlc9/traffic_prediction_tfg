@@ -1,5 +1,6 @@
 # Entorns virtuals
 .venv/
+.venv_tf/
 __pycache__/
 *.pyc
 

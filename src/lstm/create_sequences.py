@@ -26,7 +26,7 @@ def create_all_sequences(
     value_col: str = "estatActual_norm"
 ) -> Dict[str, np.ndarray]:
     """
-    Crea seqüències globals (tots els trams) sense barrejar sèries entre trams.
+    Crea seqüències globals sense barrejar sèries entre trams.
     Les seqüències es classifiquen en train/val/test segons el split del target.
     """
     # Ens assegurem de l'ordre correcte
@@ -196,24 +196,24 @@ def main():
     df = pl.read_parquet(DATA_PATH)
     print(f"   Shape original: {df.shape}")
 
-    # 2. Preparar dades amb splits (i filtrar als trams seleccionats)
+    # 2. Preparar dades amb splits
     print("\n2. Preparant dades amb splits...")
     info = get_all_trams_data(df)
     df_with_splits = info["df"]
     print(f"   Shape després de filtrar trams seleccionats: {df_with_splits.shape}")
 
-    # 3. Normalitzar (afegirà, per exemple, 'estatActual_norm')
+    # 3. Normalitzar
     print("\n3. Normalitzant dades...")
     df_normalized, normalizer = normalize_traffic_data(df_with_splits)
     print(f"   Columnes disponibles: {df_normalized.columns}")
 
     # 4. Crear seqüències globals
-    print("\n4. Creant seqüències globals (tots els trams)...")
+    print("\n4. Creant seqüències globals...")
     sequences = create_all_sequences(
         df_normalized,
         window_size=WINDOW_SIZE,
         horizon=HORIZON,
-        value_col="estatActual_norm",  # assegura't que aquest nom coincideix
+        value_col="estatActual_norm",
     )
 
     # 5. Mostrar resum

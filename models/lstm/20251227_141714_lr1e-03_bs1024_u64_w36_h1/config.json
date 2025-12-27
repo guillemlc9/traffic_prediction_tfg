@@ -1,0 +1,20 @@
+{
+  "SEQUENCES_DIR": "data/processed/lstm_sequences",
+  "window_size": 36,
+  "horizon": 1,
+  "lstm_units": 64,
+  "dense_units": 32,
+  "learning_rate": 0.001,
+  "epochs": 50,
+  "batch_size": 1024,
+  "optimizer": "legacy.Adam",
+  "loss": "mse",
+  "metric": "mae",
+  "python_version": "3.11.14",
+  "tensorflow_version": "2.15.0",
+  "devices": [
+    "/physical_device:CPU:0",
+    "/physical_device:GPU:0"
+  ],
+  "platform": "macOS-26.2-arm64-arm-64bit"
+}
