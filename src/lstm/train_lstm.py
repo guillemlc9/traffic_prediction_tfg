@@ -227,7 +227,8 @@ def compute_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> Dict[str, float]:
 
 
 def save_training_history(history: keras.callbacks.History, run_dir: Path):
-    save_json(run_dir / "training_history.json", history.history)
+    history_clean = {k: [float(v) for v in vals] for k, vals in history.history.items()}
+    save_json(run_dir / "training_history.json", history_clean)
 
 
 def save_predictions_and_metrics(
