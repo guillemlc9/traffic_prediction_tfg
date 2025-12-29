@@ -32,7 +32,7 @@ def build_lstm_model(
     window_size: int = 36,
     lstm_units: int = 64,
     dense_units: int = 32,
-    learning_rate: float = 1e-3
+    learning_rate: float = 3e-4
 ) -> keras.Model:
     """
     Construeix el model LSTM.
@@ -116,7 +116,7 @@ def train_model(
         # Early stopping
         callbacks.EarlyStopping(
             monitor="val_loss",
-            patience=10,
+            patience=15,
             restore_best_weights=True,
             verbose=1
         ),
@@ -133,7 +133,7 @@ def train_model(
         callbacks.ReduceLROnPlateau(
             monitor="val_loss",
             factor=0.5,
-            patience=4,
+            patience=5,
             min_lr=1e-6,
             verbose=1
         ),
@@ -272,7 +272,7 @@ def main():
     HORIZON = 1
     LSTM_UNITS = 64
     DENSE_UNITS = 32
-    LEARNING_RATE = 1e-3
+    LEARNING_RATE = 3e-4
     EPOCHS = 50
     BATCH_SIZE = 1024
 
