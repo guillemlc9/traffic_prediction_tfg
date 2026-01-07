@@ -47,10 +47,8 @@ def main():
     if not csv_files:
         raise FileNotFoundError(f"No s'han trobat CSV a {RAW_DIR}")
 
-    print(f"Llegint {len(csv_files)} fitxers CSV…")
     dfs = [read_and_clean_csv(f) for f in csv_files]
 
-    print("Concatenant…")
     df_all = pl.concat(dfs, how="vertical")
 
     df_all = (
@@ -58,9 +56,7 @@ def main():
               .sort(["idTram", "timestamp"])
     )
 
-    print(f"Guardant Parquet: {PARQUET_FILE}")
     df_all.write_parquet(PARQUET_FILE, compression="zstd")
-    print("Fet ✅")
 
 if __name__ == "__main__":
     main()

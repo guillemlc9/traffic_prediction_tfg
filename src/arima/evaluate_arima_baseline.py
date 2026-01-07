@@ -152,7 +152,6 @@ def evaluate_all_models(
     print("=" * 60)
     
     # Carregar dades
-    print("\nCarregant dades...")
     df = pl.read_parquet(DATA_PATH)
     
     # Obtenir splits temporals
@@ -221,7 +220,7 @@ def evaluate_all_models(
     Path(MODELS_DIR).mkdir(parents=True, exist_ok=True)
     output_path = f"{MODELS_DIR}/evaluation_metrics_{split}.parquet"
     results_df.write_parquet(output_path)
-    print(f"\n💾 Mètriques guardades: {output_path}")
+    print(f"\n Mètriques guardades: {output_path}")
     
     # Resum
     print("\n" + "=" * 60)
@@ -250,8 +249,6 @@ def evaluate_all_models(
         print(f"  Mediana: {successful_df['rmse'].median():.4f}")
         print(f"  Q3: {successful_df['rmse'].quantile(0.75):.4f}")
         print(f"  Max: {successful_df['rmse'].max():.4f}")
-    
-    print("\nAvaluació completada!")
     
     return results_df
 
@@ -373,8 +370,6 @@ def create_visualizations(metrics_df: pl.DataFrame, split: str = 'test'):
     print(f"Visualització guardada: {output_path}")
     
     plt.close()
-    
-    print("\nVisualitzacions completades!")
 
 
 def create_confusion_matrix(split: str = 'test'):
@@ -505,8 +500,6 @@ def create_confusion_matrix(split: str = 'test'):
     # Calcular MAE per validar
     mae = np.mean(np.abs(all_y_true - all_y_pred))
     print(f"\nMAE global: {mae:.4f}")
-    
-    print("\nMatriu de confusió completada!")
 
 
 def main():

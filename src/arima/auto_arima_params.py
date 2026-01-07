@@ -76,7 +76,7 @@ def find_best_arima(series: pd.Series, seasonal: bool = False, verbose: bool = T
         return result
         
     except Exception as e:
-        print(f"  ⚠️  Error: {e}")
+        print(f"Error: {e}")
         return {
             'p': 0,
             'd': 0,
@@ -104,7 +104,6 @@ def main(trams: list = None, seasonal: bool = False):
     print("=" * 60)
     
     # Llegim les dades
-    print("\nCarregant dades...")
     df = pl.read_parquet(DATA_PATH)
     
     if trams is None:
@@ -146,10 +145,10 @@ def main(trams: list = None, seasonal: bool = False):
     # Guardem resultats
     results_df = pl.DataFrame(results)
     results_df.write_parquet(OUTPUT_PATH)
-    print(f"\n✅ Resultats guardats a: {OUTPUT_PATH}")
+    print(f"Resultats guardats a: {OUTPUT_PATH}")
     
     # Resum
-    print("\n" + "=" * 60)
+    print("=" * 60)
     print("RESUM")
     print("=" * 60)
     

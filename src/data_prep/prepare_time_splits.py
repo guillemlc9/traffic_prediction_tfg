@@ -225,18 +225,15 @@ def main():
     print_splits_summary(splits_info)
     
     # Preparar dades de tots els trams
-    print(f"\nPreparant dades per {len(SELECTED_TRAMS)} trams...")
     data = get_all_trams_data(df, SELECTED_TRAMS)
     
     # Obtenim dades d'un tram
-    print(f"\nExemple - Tram {SELECTED_TRAMS[0]}:")
     for split in ['train', 'val', 'test']:
         series = data['get_tram_series'](SELECTED_TRAMS[0], split)
         print(f"  {split.upper()}: {len(series)} registres")
         print(f"    Rang: {series.index.min()} → {series.index.max()}")
     
     # Verificar tots els trams
-    print(f"\nVerificant tots els trams:")
     for tram_id in SELECTED_TRAMS[:5]:  # Mostrar només 5 primers
         train = data['get_tram_series'](tram_id, 'train')
         val = data['get_tram_series'](tram_id, 'val')
@@ -244,7 +241,6 @@ def main():
         total = len(train) + len(val) + len(test)
         print(f"  Tram {tram_id:3d}: Train={len(train):6d}, Val={len(val):5d}, Test={len(test):5d}, Total={total:6d}")
     
-    print(f"\nPreparació completada!")
 
 
 if __name__ == "__main__":
