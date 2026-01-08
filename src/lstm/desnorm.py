@@ -17,7 +17,7 @@ import json
 import numpy as np
 from typing import Dict
 
-# Afegir el directori arrel al PYTHONPATH
+# Afegim el directori arrel al PYTHONPATH
 root_dir = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(root_dir))
 
@@ -90,68 +90,51 @@ def main():
     """
     
     # Rutes dels fitxers
-    # NOTA: Modifica aquesta ruta amb el directori del teu model entrenat
+    # PD: Segons el model que es vulgui desnormalitzar, es canvia el directori
     MODEL_DIR = "models/lstm/20251227_143405_lr1e-03_bs1024_u64_w36_h1"
     NORM_PARAMS_PATH = "models/lstm/normalization_params.json"
     
     model_dir = Path(MODEL_DIR)
     
-    print("=" * 60)
-    print("DESNORMALITZACIÓ DE PREDICCIONS LSTM")
-    print("=" * 60)
-    print(f"Model dir: {model_dir}\n")
-    
-    # 1. Carregar paràmetres de normalització
-    print("1. Carregant paràmetres de normalització...")
+    # 1. Carreguem paràmetres de normalització
     params = load_normalization_params(NORM_PARAMS_PATH)
     mean = params["mean"]
     std = params["std"]
     
-    # 2. Carregar y_test i y_pred (normalitzats)
-    print("2. Carregant y_test i y_pred normalitzats...")
+    # 2. Carreguem y_test i y_pred (normalitzats)
     y_test_norm = np.load(model_dir / "y_test.npy")
     y_pred_norm = np.load(model_dir / "y_pred_test.npy")
     
     print(f"   Shape y_test: {y_test_norm.shape}")
     print(f"   Shape y_pred: {y_pred_norm.shape}\n")
     
-    # 3. Desnormalitzar
-    print("3. Desnormalitzant valors...")
+    # 3. Desnormalitzem valors
     y_test_denorm = denormalize(y_test_norm, mean, std)
     y_pred_denorm = denormalize(y_pred_norm, mean, std)
     
-    print(f"   ✓ y_test desnormalitzat")
-    print(f"   ✓ y_pred desnormalitzat\n")
+    print(f"    y_test desnormalitzat")
+    print(f"    y_pred desnormalitzat\n")
     
-    # 4. Calcular mètriques normalitzades (per comparar)
-    print("4. Calculant mètriques...")
+    # 4. Calculem mètriques normalitzades
     metrics_norm = compute_metrics(y_test_norm, y_pred_norm)
     metrics_denorm = compute_metrics(y_test_denorm, y_pred_denorm)
-    
-    print("\n" + "=" * 60)
-    print("MÈTRIQUES NORMALITZADES (escala z-score)")
-    print("=" * 60)
+
     print(f"MAE:  {metrics_norm['mae']:.6f}")
     print(f"MSE:  {metrics_norm['mse']:.6f}")
     print(f"RMSE: {metrics_norm['rmse']:.6f}")
     
-    print("\n" + "=" * 60)
-    print("MÈTRIQUES DESNORMALITZADES (escala original)")
-    print("=" * 60)
     print(f"MAE:  {metrics_denorm['mae']:.6f}")
     print(f"MSE:  {metrics_denorm['mse']:.6f}")
     print(f"RMSE: {metrics_denorm['rmse']:.6f}")
-    print("=" * 60)
     
-    # 5. Guardar resultats desnormalitzats
-    print("\n5. Guardant resultats desnormalitzats...")
+    # 5. Guardem resultats desnormalitzats
     output_dir = model_dir / "denormalized"
     output_dir.mkdir(exist_ok=True)
     
     np.save(output_dir / "y_test_denorm.npy", y_test_denorm)
     np.save(output_dir / "y_pred_denorm.npy", y_pred_denorm)
     
-    # Guardar mètriques desnormalitzades
+    # Guardem mètriques desnormalitzades
     metrics_output = {
         "normalized": metrics_norm,
         "denormalized": metrics_denorm,
@@ -164,12 +147,12 @@ def main():
     with open(output_dir / "metrics_denorm.json", 'w') as f:
         json.dump(metrics_output, f, indent=2)
     
-    print(f"   ✓ y_test_denorm.npy guardat")
-    print(f"   ✓ y_pred_denorm.npy guardat")
-    print(f"   ✓ metrics_denorm.json guardat")
-    print(f"\nResultats guardats a: {output_dir}")
+    print(f"    y_test_denorm.npy guardat")
+    print(f"    y_pred_denorm.npy guardat")
+    print(f"    metrics_denorm.json guardat")
+    print(f"Resultats guardats a: {output_dir}")
     
-    # 6. Mostrar exemple de valors
+    # 6. Mostrem exemple de valors
     print("\n" + "=" * 60)
     print("EXEMPLE DE VALORS (primeres 10 mostres)")
     print("=" * 60)
@@ -179,7 +162,7 @@ def main():
         print(f"{i:<8} {y_test_norm[i]:<15.4f} {y_test_denorm[i]:<15.4f} {y_pred_norm[i]:<15.4f} {y_pred_denorm[i]:<15.4f}")
     print("=" * 60)
     
-    print("\n✅ Procés completat!")
+    print("\nProcés completat!")
     print("\nAra pots comparar les mètriques desnormalitzades amb les d'ARIMA.")
 
 

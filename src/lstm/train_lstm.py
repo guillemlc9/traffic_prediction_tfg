@@ -182,7 +182,7 @@ def save_final_model(
     
     filepath = run_dir / "final.keras"
     model.save(filepath)
-    print(f"\n✅ Model final guardat a: {filepath}")
+    print(f"\nModel final guardat a: {filepath}")
 
 
 def print_model_summary(model: keras.Model):
@@ -255,7 +255,7 @@ def save_predictions_and_metrics(
     }
 
     save_json(run_dir / "metrics.json", metrics_payload)
-    print(f"✅ metrics.json guardat a: {run_dir / 'metrics.json'}")
+    print(f"metrics.json guardat a: {run_dir / 'metrics.json'}")
     
 
 def main():
@@ -291,7 +291,7 @@ def main():
     }
 
     run_dir = make_run_dir(BASE_DIR, config)
-    print(f"\n📁 Run dir: {run_dir}")
+    print(f"\nRun dir: {run_dir}")
 
     # info d'entorn (molt útil per la memòria)
     env_info = {
@@ -376,7 +376,7 @@ def main():
     
     # Resum final
     print("\n" + "="*60)
-    print("✅ ENTRENAMENT COMPLETAT!")
+    print("ENTRENAMENT COMPLETAT!")
     print("="*60)
     print(f"Millor val_loss: {min(history.history['val_loss']):.4f}")
     print(f"Millor val_mae: {min(history.history['val_mae']):.4f}")

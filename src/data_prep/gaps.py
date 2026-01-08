@@ -88,8 +88,7 @@ def find_global_gaps(df: pl.DataFrame,
                      freq_minutes: int = 5,
                      tolerance_minutes: int = 1) -> pl.DataFrame:
     """
-    Detecta buits de la sèrie temporal global
-    (sense repetir per cada tram).
+    Detecta buits de la sèrie temporal global.
 
     Returns
     -------
@@ -121,7 +120,7 @@ def find_global_gaps(df: pl.DataFrame,
 
 def classify_gaps_from_calendar(df: pl.DataFrame, freq_minutes: int = 5) -> pl.DataFrame:
     """
-    df: calendari d'UN tram, amb 'timestamp' (ordenable) i 'is_gap' (bool).
+    df: calendari d'un tram, amb 'timestamp' i 'is_gap'.
     Retorna df + ['gap_minutes', 'gap_type'] per fila.
     """
     if df.is_empty():
@@ -133,7 +132,6 @@ def classify_gaps_from_calendar(df: pl.DataFrame, freq_minutes: int = 5) -> pl.D
     base = (
         df.sort("timestamp")
           .with_columns([
-              # marca canvi respecte la fila anterior (True al primer)
               (pl.col("is_gap") != pl.col("is_gap").shift(1))
                 .fill_null(True)
                 .cast(pl.Int32)

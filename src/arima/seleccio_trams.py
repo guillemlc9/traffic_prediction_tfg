@@ -1,6 +1,6 @@
 """
 Mòdul on calcularem per cada tram el seu valor de variànça i el percentatge de valors imputats.
-A partir d'aquestes variables, seleccionarem els trams més importants per a la prediccio.
+A partir d'aquestes variables, seleccionarem els trams per a la prediccio.
 """
 
 import polars as pl
@@ -50,8 +50,8 @@ variance_classified_sorted = variance_classified.sort(
     descending=[False, True]
 )
 
-# Guardem a Excel
+# Guardem en Excel
 variance_classified_sorted.write_excel(output_path)
 
-print(f"\n✅ Fitxer guardat a: {output_path}")
+print(f"\nFitxer guardat a: {output_path}")
 print(f"Total de trams exportats: {len(variance_classified_sorted)}")

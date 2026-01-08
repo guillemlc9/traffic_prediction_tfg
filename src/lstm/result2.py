@@ -81,9 +81,9 @@ def plot_training_history(history_path: str, output_path: str = None):
         gap = val_loss[-1] - loss[-1]
         print(f"\nGap entre train i val loss: {gap:.4f}")
         if gap > 0.01:
-            print("⚠️  Possible overfitting detectat (val_loss > train_loss)")
+            print("Possible overfitting detectat (val_loss > train_loss)")
         else:
-            print("✓ Model estable (gap mínim entre train i val)")
+            print("Model estable (gap mínim entre train i val)")
     
     print("="*60 + "\n")
 

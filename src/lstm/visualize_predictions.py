@@ -12,7 +12,7 @@ NOTA: Aquest script carrega el model entrenat i genera prediccions noves
 sobre una seqüència temporal contínua del tram especificat.
 """
 
-# Fix per TensorFlow mutex issues en macOS
+# TensorFlow mutex issues en macOS
 import os
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 os.environ['OMP_NUM_THREADS'] = '1'
@@ -24,7 +24,7 @@ import json
 import numpy as np
 import polars as pl
 import matplotlib
-matplotlib.use('Agg')  # Backend sense GUI per evitar problemes
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from datetime import datetime
 
@@ -72,7 +72,7 @@ def create_predictions_for_tram(
     n_needed = n_samples_total + window_size
     
     if len(df_tram) < n_needed:
-        print(f"⚠️  Advertència: només hi ha {len(df_tram)} punts, es visualitzaran menys dies")
+        print(f"Advertència: només hi ha {len(df_tram)} punts, es visualitzaran menys dies")
         n_samples_total = max(0, len(df_tram) - window_size)
     
     # Extreure valors
@@ -155,7 +155,7 @@ def plot_predictions(
     # Guardar
     output_path.parent.mkdir(parents=True, exist_ok=True)
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
-    print(f"✅ Gràfic guardat a: {output_path}")
+    print(f"Gràfic guardat a: {output_path}")
     
     plt.close()
 
@@ -245,8 +245,8 @@ def main():
     print(f"Rang prediccions:   [{y_pred.min():.2f}, {y_pred.max():.2f}]")
     print("=" * 60)
     
-    print("\n✅ Visualització completada!")
-    print(f"\nEl gràfic mostra com el model LSTM captura:")
+    print("Visualització completada!")
+    print(f"El gràfic mostra com el model LSTM captura:")
     print("  - Transicions suaus entre estats de trànsit")
     print("  - Canvis sobtats en les condicions de trànsit")
     print(f"  - Patrons temporals del tram {TARGET_TRAM}")

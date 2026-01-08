@@ -14,7 +14,7 @@ Aquest script:
 import sys
 from pathlib import Path
 
-# Afegir el directori arrel al PYTHONPATH
+# Afegim el directori arrel al PYTHONPATH
 root_dir = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(root_dir))
 
@@ -36,7 +36,7 @@ def load_arima_metrics(metrics_path: str = "models/arima/evaluation_metrics_test
         DataFrame amb columnes: idTram, mae, rmse, ...
     """
     df = pl.read_parquet(metrics_path)
-    # Filtrar només els models correctes
+    # Filtrem només els models correctes
     df = df.filter(pl.col('success') == True)
     return df.select(['idTram', 'mae', 'rmse', 'n_samples'])
 
@@ -220,7 +220,7 @@ def create_visualizations(comparison_df: pl.DataFrame, output_dir: str = "report
     bars1 = ax.bar(x - width/2, mae_improvement, width, label='MAE', alpha=0.8)
     bars2 = ax.bar(x + width/2, rmse_improvement, width, label='RMSE', alpha=0.8)
     
-    # Colorar barres segons si hi ha millora o empitjorament
+    # Color de les barres segons si hi ha millora o empitjorament
     for bars in [bars1, bars2]:
         for bar in bars:
             if bar.get_height() < 0:
@@ -239,7 +239,7 @@ def create_visualizations(comparison_df: pl.DataFrame, output_dir: str = "report
     
     plt.tight_layout()
     plt.savefig(f"{output_dir}/improvement_by_variance.png", dpi=300, bbox_inches='tight')
-    print(f"✓ Visualització guardada: {output_dir}/improvement_by_variance.png")
+    print(f"Visualització guardada: {output_dir}/improvement_by_variance.png")
     plt.close()
 
 
@@ -254,7 +254,7 @@ def print_summary(comparison_df: pl.DataFrame, table_df: pd.DataFrame):
     print("\nTaula Comparativa:")
     print("-" * 80)
     
-    # Formatació de la taula
+    # Format de la taula
     pd.set_option('display.max_columns', None)
     pd.set_option('display.width', None)
     pd.set_option('display.float_format', lambda x: f'{x:.4f}')
@@ -283,16 +283,7 @@ def print_summary(comparison_df: pl.DataFrame, table_df: pd.DataFrame):
     print(f"\nDiferències (LSTM - ARIMA):")
     print(f"  Δ MAE:  {mae_diff:+.4f} ({(mae_diff/arima_mae_global)*100:+.2f}%)")
     print(f"  Δ RMSE: {rmse_diff:+.4f} ({(rmse_diff/arima_rmse_global)*100:+.2f}%)")
-    
-    # Determinar quin model és millor
-    if mae_diff < 0 and rmse_diff < 0:
-        print("\n✅ LSTM és millor que ARIMA en ambdues mètriques")
-    elif mae_diff > 0 and rmse_diff > 0:
-        print("\n✅ ARIMA és millor que LSTM en ambdues mètriques")
-    else:
-        print("\n⚖️  Els models tenen rendiments mixtos segons la mètrica")
-    
-    print("=" * 80)
+
 
 
 def main():
@@ -308,13 +299,13 @@ def main():
     # 1. Carregar mètriques
     print("\n1. Carregant mètriques...")
     arima_metrics = load_arima_metrics()
-    print(f"   ✓ ARIMA: {arima_metrics.height} trams")
+    print(f"ARIMA: {arima_metrics.height} trams")
     
     lstm_metrics = load_lstm_metrics()
-    print(f"   ✓ LSTM: {lstm_metrics.height} trams")
+    print(f"LSTM: {lstm_metrics.height} trams")
     
     variance_classification = load_variance_classification()
-    print(f"   ✓ Classificació de variància: {variance_classification.height} trams")
+    print(f"Classificació de variància: {variance_classification.height} trams")
     
     # 2. Agregar per variància
     print("\n2. Agregant mètriques per categoria de variància...")
@@ -331,17 +322,12 @@ def main():
     # Guardar com Excel
     excel_path = f"{OUTPUT_DIR}/model_comparison_by_variance.xlsx"
     table_df.to_excel(excel_path, index=False, engine='openpyxl')
-    print(f"   ✓ Taula Excel guardada: {excel_path}")
+    print(f"Taula Excel guardada: {excel_path}")
     
     # Guardar com CSV
     csv_path = f"{OUTPUT_DIR}/model_comparison_by_variance.csv"
     table_df.to_csv(csv_path, index=False)
-    print(f"   ✓ Taula CSV guardada: {csv_path}")
-    
-    # Guardar com Parquet
-    parquet_path = f"{OUTPUT_DIR}/model_comparison_by_variance.parquet"
-    comparison_df.write_parquet(parquet_path)
-    print(f"   ✓ Dades Parquet guardades: {parquet_path}")
+    print(f"Taula CSV guardada: {csv_path}")
     
     # 5. Crear visualitzacions
     print("\n5. Creant visualitzacions...")
@@ -351,8 +337,7 @@ def main():
     print_summary(comparison_df, table_df)
     
     print("\n" + "=" * 80)
-    print("✅ COMPARACIÓ COMPLETADA!")
-    print(f"   Resultats guardats a: {OUTPUT_DIR}")
+    print(f"Resultats guardats a: {OUTPUT_DIR}")
     print("=" * 80)
 
 

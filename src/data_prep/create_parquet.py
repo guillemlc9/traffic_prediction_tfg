@@ -11,7 +11,7 @@ Executa des de l'arrel del repositori:
 import polars as pl
 from pathlib import Path
 
-# --- Configuració -----------------------------------------------------------
+# Configuració
 
 # Carpetes
 RAW_DIR = Path("/Users/guillemlopezcolomer/Library/CloudStorage/GoogleDrive-guillemlc9@gmail.com/My Drive/TFG/Data/Open Data BCN/Trànsit/dades")
@@ -20,7 +20,6 @@ OUTPUT.mkdir(parents=True, exist_ok=True)
 
 PARQUET_FILE = OUTPUT / "dataset_1y.parquet"
 
-# ---------------------------------------------------------------------------
 
 def read_and_clean_csv(csv_path: Path) -> pl.DataFrame:
     """Llegeix un CSV i fa la conversió del camp 'data' a timestamp."""

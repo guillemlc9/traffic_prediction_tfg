@@ -1,8 +1,8 @@
 """
 prepare_time_splits.py
 ----------------------
-Prepara les sèries temporals dels 30 trams seleccionats amb splits temporals
-consistents (75% train, 10% val, 15% test) per a tots els models.
+Prepara les sèries temporals dels 30 trams seleccionats per obtenir 
+splits temporals (75% train, 10% val, 15% test) per a tots els models.
 """
 
 import polars as pl
@@ -26,7 +26,7 @@ def get_temporal_splits(df: pl.DataFrame) -> Dict[str, datetime]:
     Splits:
     - Train: primers 75% dels mesos
     - Validation: següent 10% dels mesos
-    - Test: últims 15% dels mesos
+    - Test: últim 15% dels mesos
     
     Parameters
     ----------
@@ -97,7 +97,7 @@ def prepare_tram_series(
     if splits_info is None:
         splits_info = get_temporal_splits(df)
     
-    # Determinar rang temporal segons el split
+    # Determinem el rang temporal segons el split
     if split == 'train':
         start = splits_info['train_start']
         end = splits_info['train_end']
@@ -110,7 +110,7 @@ def prepare_tram_series(
     else:
         raise ValueError(f"Split '{split}' no vàlid. Utilitza 'train', 'val' o 'test'")
     
-    # Filtrar per tram i rang temporal
+    # Filtrem per tram i rang temporal
     df_filtered = (
         df.filter(
             (pl.col('idTram') == tram_id) &
@@ -122,7 +122,7 @@ def prepare_tram_series(
         .to_pandas()
     )
     
-    # Establir timestamp com a index
+    # Establim timestamp com a index
     df_filtered = df_filtered.set_index('timestamp')
     
     return df_filtered
@@ -156,7 +156,7 @@ def get_all_trams_data(
     # Splits
     splits_info = get_temporal_splits(df)
     
-    # Filtrar dataset pels trams seleccionats
+    # Filtrem dataset pels trams seleccionats
     df_filtered = df.filter(pl.col('idTram').is_in(tram_ids))
     
     return {
@@ -182,13 +182,13 @@ def print_splits_summary(splits_info: Dict[str, datetime]) -> None:
     print("SPLITS TEMPORALS")
     print("=" * 60)
     
-    # Calcular durades
+    # Calculem durades
     total_duration = splits_info['test_end'] - splits_info['train_start']
     train_duration = splits_info['train_end'] - splits_info['train_start']
     val_duration = splits_info['val_end'] - splits_info['val_start']
     test_duration = splits_info['test_end'] - splits_info['test_start']
     
-    # Calcular percentatges
+    # Calculem percentatges
     train_pct = (train_duration / total_duration) * 100
     val_pct = (val_duration / total_duration) * 100
     test_pct = (test_duration / total_duration) * 100
@@ -215,7 +215,7 @@ def main():
     """
     Ús del mòdul.
     """
-    # Carregar dades
+    # Carreguem les dades
     DATA_PATH = "data/processed/dataset_imputed_clean.parquet"
     print(f"Carregant dades de {DATA_PATH}...")
     df = pl.read_parquet(DATA_PATH)
@@ -224,17 +224,17 @@ def main():
     splits_info = get_temporal_splits(df)
     print_splits_summary(splits_info)
     
-    # Preparar dades de tots els trams
+    # Preparem les dades de tots els trams
     data = get_all_trams_data(df, SELECTED_TRAMS)
     
-    # Obtenim dades d'un tram
+    # Obtenim les dades d'un tram
     for split in ['train', 'val', 'test']:
         series = data['get_tram_series'](SELECTED_TRAMS[0], split)
         print(f"  {split.upper()}: {len(series)} registres")
         print(f"    Rang: {series.index.min()} → {series.index.max()}")
     
-    # Verificar tots els trams
-    for tram_id in SELECTED_TRAMS[:5]:  # Mostrar només 5 primers
+    # Verifiquem tots els trams
+    for tram_id in SELECTED_TRAMS[:5]: # només per comprovar
         train = data['get_tram_series'](tram_id, 'train')
         val = data['get_tram_series'](tram_id, 'val')
         test = data['get_tram_series'](tram_id, 'test')

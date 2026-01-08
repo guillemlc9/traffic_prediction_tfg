@@ -87,11 +87,11 @@ def make_predictions(
     np.ndarray
         Prediccions per al conjunt de test
     """
-    # Entrenar model amb dades de train
+    # Entrenem el model amb les dades de train
     model = ARIMA(train_series, order=order)
     fitted_model = model.fit()
     
-    # Fer prediccions per al conjunt de test
+    # Fem les prediccions per al conjunt de test
     n_steps = len(test_series)
     predictions = fitted_model.forecast(steps=n_steps)
     
@@ -147,28 +147,24 @@ def evaluate_all_models(
     if tram_ids is None:
         tram_ids = SELECTED_TRAMS
     
-    print("=" * 60)
-    print(f"AVALUACIÓ MODELS ARIMA - Split: {split.upper()}")
-    print("=" * 60)
-    
-    # Carregar dades
+    # Carreguem les dades
     df = pl.read_parquet(DATA_PATH)
     
-    # Obtenir splits temporals
+    # Obtenim els splits temporals
     splits_info = get_temporal_splits(df)
     print(f"\nAvaluant sobre: {splits_info[f'{split}_start']} → {splits_info[f'{split}_end']}")
     
-    # Avaluar models
+    # Avaluem els models
     results = []
     for i, tram_id in enumerate(tram_ids, 1):
         print(f"\n[{i}/{len(tram_ids)}] Avaluant Tram {tram_id}")
         
         try:
-            # Carregar paràmetres del model
+            # Carreguem els paràmetres del model
             model_params = load_model_params(tram_id)
             order = model_params['order']
             
-            # Obtenir dades
+            # Obtenim les dades
             train_data = prepare_tram_series(df, tram_id, 'train', splits_info)
             test_data = prepare_tram_series(df, tram_id, split, splits_info)
             
@@ -178,17 +174,17 @@ def evaluate_all_models(
             print(f"  Train: {len(train_series)} registres")
             print(f"  {split.capitalize()}: {len(test_series)} registres")
             
-            # Fer prediccions
+            # Fem les prediccions
             predictions = make_predictions(train_series, test_series, order)
             
-            # Calcular mètriques
+            # Calculem les mètriques
             metrics = calculate_metrics(test_series.values, predictions)
             
             print(f"  MAE: {metrics['mae']:.4f}")
             print(f"  RMSE: {metrics['rmse']:.4f}")
             print(f"  MAPE: {metrics['mape']:.2f}%")
             
-            # Guardar resultats
+            # Guardem els resultats
             results.append({
                 'idTram': tram_id,
                 'split': split,
@@ -213,19 +209,14 @@ def evaluate_all_models(
                 'error': str(e)
             })
     
-    # Crear DataFrame amb resultats
+    # Creem el DataFrame amb els resultats
     results_df = pl.DataFrame(results)
     
-    # Guardar mètriques
+    # Guardem les mètriques
     Path(MODELS_DIR).mkdir(parents=True, exist_ok=True)
     output_path = f"{MODELS_DIR}/evaluation_metrics_{split}.parquet"
     results_df.write_parquet(output_path)
     print(f"\n Mètriques guardades: {output_path}")
-    
-    # Resum
-    print("\n" + "=" * 60)
-    print("RESUM AVALUACIÓ")
-    print("=" * 60)
     
     successful_df = results_df.filter(pl.col('success') == True)
     
@@ -264,31 +255,28 @@ def create_visualizations(metrics_df: pl.DataFrame, split: str = 'test'):
     split : str
         Split avaluat
     """
-    print("\n" + "=" * 60)
-    print("GENERANT VISUALITZACIONS")
-    print("=" * 60)
     
-    # Crear directori de sortida
+    # Creem el directori de sortida
     Path(OUTPUT_PLOTS_DIR).mkdir(parents=True, exist_ok=True)
     
-    # Filtrar només models correctes
+    # Filtrem només models correctes
     successful_df = metrics_df.filter(pl.col('success') == True).to_pandas()
     
-    # Carregar classificació de variància
+    # Carreguem la classificació de variància
     variance_df = pl.read_excel(VARIANCE_CLASSIFICATION_PATH)
     variance_dict = dict(zip(
         variance_df['idTram'].to_list(),
         variance_df['categoria_variancia'].to_list()
     ))
     
-    # Afegir categoria de variància al DataFrame de mètriques
+    # Afegim la categoria de variància al DataFrame de mètriques
     successful_df['categoria_variancia'] = successful_df['idTram'].map(variance_dict)
     
-    # Configurar estil
+    # Configurem l'estil
     sns.set_style("whitegrid")
     plt.rcParams['figure.figsize'] = (12, 5)
     
-    # Crear figura amb 2 subplots
+    # Creem la figura amb 2 subplots
     fig, axes = plt.subplots(1, 2, figsize=(14, 6))
     
     # 1. Boxplot de MAE per tram
@@ -299,7 +287,7 @@ def create_visualizations(metrics_df: pl.DataFrame, split: str = 'test'):
     ax1.set_ylabel('MAE', fontsize=12)
     ax1.grid(True, alpha=0.3)
     
-    # Afegir estadístiques
+    # Afegim estadístiques
     mae_mean = successful_df['mae'].mean()
     mae_median = successful_df['mae'].median()
     ax1.axhline(mae_mean, color='red', linestyle='--', linewidth=2, label=f'Mitjana: {mae_mean:.4f}')
@@ -314,34 +302,33 @@ def create_visualizations(metrics_df: pl.DataFrame, split: str = 'test'):
     ax2.set_ylabel('Freqüència', fontsize=12)
     ax2.grid(True, alpha=0.3, axis='y')
     
-    # Afegir línia de mitjana
+    # Afegim la línia de mitjana
     rmse_mean = successful_df['rmse'].mean()
     ax2.axvline(rmse_mean, color='red', linestyle='--', linewidth=2, label=f'Mitjana: {rmse_mean:.4f}')
     ax2.legend()
     
     plt.tight_layout()
     
-    # Guardar figura
+    # Guardem la figura
     output_path = f"{OUTPUT_PLOTS_DIR}/metrics_distribution_{split}.png"
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
-    print(f"\nVisualització guardada: {output_path}")
     
     plt.close()
     
-    # Crear gràfic addicional: MAE per tram (barplot amb colors per categoria de variància)
+    # Creem el gràfic addicional: MAE per tram (barplot en colors per categoria de variància)
     fig, ax = plt.subplots(figsize=(16, 6))
     
-    # Ordenar per MAE
+    # Ordenem per MAE
     successful_df_sorted = successful_df.sort_values('mae')
     
-    # Definir colors per categoria de variància
+    # Definim els colors per categoria de variància
     color_map = {
         'alta': '#d62728',      # Vermell
         'mitjana': '#ff7f0e',   # Taronja
         'baixa': '#2ca02c'      # Verd
     }
     
-    # Assignar colors segons la categoria de variància
+    # Assignem els colors segons la categoria de variància
     colors = [color_map.get(cat, 'gray') for cat in successful_df_sorted['categoria_variancia']]
     
     ax.bar(range(len(successful_df_sorted)), successful_df_sorted['mae'], color=colors, alpha=0.7, edgecolor='black')
@@ -353,7 +340,7 @@ def create_visualizations(metrics_df: pl.DataFrame, split: str = 'test'):
     ax.axhline(mae_mean, color='black', linestyle='--', linewidth=2, label=f'Mitjana: {mae_mean:.4f}')
     ax.grid(True, alpha=0.3, axis='y')
     
-    # Crear llegenda personalitzada per les categories
+    # Creem la llegenda personalitzada per les categories
     from matplotlib.patches import Patch
     legend_elements = [
         Patch(facecolor=color_map['alta'], edgecolor='black', alpha=0.7, label='Variància Alta'),
@@ -367,7 +354,6 @@ def create_visualizations(metrics_df: pl.DataFrame, split: str = 'test'):
     
     output_path = f"{OUTPUT_PLOTS_DIR}/mae_per_tram_{split}.png"
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
-    print(f"Visualització guardada: {output_path}")
     
     plt.close()
 
@@ -385,11 +371,8 @@ def create_confusion_matrix(split: str = 'test'):
     split : str
         Split a avaluar: 'val' o 'test'
     """
-    print("\n" + "=" * 60)
-    print(f"GENERANT MATRIU DE CONFUSIÓ - Split: {split.upper()}")
-    print("=" * 60)
     
-    # Carregar dades
+    # Carreguem les dades
     df = pl.read_parquet(DATA_PATH)
     splits_info = get_temporal_splits(df)
     
@@ -397,26 +380,26 @@ def create_confusion_matrix(split: str = 'test'):
     all_y_true = []
     all_y_pred = []
     
-    # Iterar sobre tots els trams
+    # Iterem sobre tots els trams
     for i, tram_id in enumerate(SELECTED_TRAMS, 1):
         print(f"[{i}/{len(SELECTED_TRAMS)}] Processant Tram {tram_id}...", end='\r')
         
         try:
-            # Carregar paràmetres del model
+            # Carreguem els paràmetres del model
             model_params = load_model_params(tram_id)
             order = model_params['order']
             
-            # Obtenir dades
+            # Obtenim les dades
             train_data = prepare_tram_series(df, tram_id, 'train', splits_info)
             test_data = prepare_tram_series(df, tram_id, split, splits_info)
             
             train_series = train_data['estatActual']
             test_series = test_data['estatActual']
             
-            # Fer prediccions
+            # Fem les prediccions
             predictions = make_predictions(train_series, test_series, order)
             
-            # Acumular valors reals i prediccions
+            # Acumulem valors reals i prediccions
             all_y_true.extend(test_series.values)
             all_y_pred.extend(predictions)
             
@@ -426,21 +409,21 @@ def create_confusion_matrix(split: str = 'test'):
     
     print(f"\n\nTotal de prediccions: {len(all_y_true)}")
     
-    # Convertir a arrays numpy
+    # Convertim a arrays numpy
     all_y_true = np.array(all_y_true)
     all_y_pred = np.array(all_y_pred)
     
-    # Arrodonir prediccions i assegurar que estan en el rang [1, 5]
+    # Arrodonim les prediccions i assegurem que estan en el rang [1, 5]
     all_y_pred_rounded = np.clip(np.round(all_y_pred), 1, 5).astype(int)
     all_y_true_int = np.clip(np.round(all_y_true), 1, 5).astype(int)
     
-    # Calcular matriu de confusió
+    # Calculem la matriu de confusió
     cm = confusion_matrix(all_y_true_int, all_y_pred_rounded, labels=[1, 2, 3, 4, 5])
     
-    # Calcular percentatges per fila (normalitzar per valors reals)
+    # Calculem els percentatges per fila (normalitzant per valors reals)
     cm_percent = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis] * 100
     
-    # Crear figura amb dues matrius: valors absoluts i percentatges
+    # Creem la figura amb dues matrius: valors absoluts i percentatges
     fig, axes = plt.subplots(1, 2, figsize=(18, 7))
     
     # 1. Matriu de confusió amb valors absoluts
@@ -469,14 +452,13 @@ def create_confusion_matrix(split: str = 'test'):
     
     plt.tight_layout()
     
-    # Guardar figura
+    # Guardem la figura
     output_path = f"{OUTPUT_PLOTS_DIR}/confusion_matrix_{split}.png"
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
-    print(f"\n✓ Matriu de confusió guardada: {output_path}")
     
     plt.close()
     
-    # Calcular i mostrar estadístiques sobre la diagonal
+    # Calculem i mostrem estadístiques sobre la diagonal
     diagonal_sum = np.trace(cm)
     near_diagonal_sum = 0
     for i in range(5):
@@ -488,16 +470,13 @@ def create_confusion_matrix(split: str = 'test'):
     diagonal_percent = (diagonal_sum / total_predictions) * 100
     near_diagonal_percent = (near_diagonal_sum / total_predictions) * 100
     far_errors_percent = 100 - diagonal_percent - near_diagonal_percent
-    
-    print("\n" + "=" * 60)
-    print("ANÀLISI DE LA MATRIU DE CONFUSIÓ")
-    print("=" * 60)
+
     print(f"\nPrediccions exactes (diagonal): {diagonal_sum} ({diagonal_percent:.2f}%)")
     print(f"Errors de ±1 (cel·les veïnes): {near_diagonal_sum} ({near_diagonal_percent:.2f}%)")
     print(f"Errors llunyans (±2 o més): {total_predictions - diagonal_sum - near_diagonal_sum} ({far_errors_percent:.2f}%)")
     print(f"\nTotal prediccions: {total_predictions}")
     
-    # Calcular MAE per validar
+    # Calculem el MAE per validar
     mae = np.mean(np.abs(all_y_true - all_y_pred))
     print(f"\nMAE global: {mae:.4f}")
 
@@ -506,17 +485,17 @@ def main():
     """
     Funció principal per avaluar els models baseline.
     """
-    # Avaluar sobre el conjunt de test
+    # Avaluem sobre el conjunt de test
     print("Avaluant models sobre el conjunt de TEST...")
     metrics_test = evaluate_all_models(
         tram_ids=SELECTED_TRAMS,
         split='test'
     )
     
-    # Crear visualitzacions
+    # Creem les visualitzacions
     create_visualizations(metrics_test, split='test')
     
-    # Crear matriu de confusió per TEST
+    # Creem la matriu de confusió per TEST
     create_confusion_matrix(split='test')
     
     # Avaluem sobre Val
@@ -529,7 +508,7 @@ def main():
     
     create_visualizations(metrics_val, split='val')
     
-    # Crear matriu de confusió per VAL
+    # Creem la matriu de confusió per VAL
     create_confusion_matrix(split='val')
     
     return metrics_test, metrics_val

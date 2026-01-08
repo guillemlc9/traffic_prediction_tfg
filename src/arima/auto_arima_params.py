@@ -2,7 +2,6 @@
 auto_arima_params.py
 --------------------
 Utilitza Auto ARIMA per trobar els millors paràmetres (p,d,q) automàticament.
-Compara els resultats amb el mètode heurístic de determine_params.py
 """
 
 import polars as pl
@@ -35,7 +34,7 @@ def find_best_arima(series: pd.Series, seasonal: bool = False, verbose: bool = T
     """
     try:
         if verbose:
-            print("  Executant Auto ARIMA...")
+            print("Executant Auto ARIMA...")
         
         model = auto_arima(
             series.dropna(),
@@ -44,14 +43,14 @@ def find_best_arima(series: pd.Series, seasonal: bool = False, verbose: bool = T
             d=None,  # Determina automàticament
             max_d=2,
             seasonal=seasonal,
-            m=288 if seasonal else 1,  # 288 = 1 dia (intervals de 5 min)
+            m=288 if seasonal else 1,  # 288 = 1 dia en intervals de 5 min
             start_P=0, max_P=2,
             start_Q=0, max_Q=2,
             D=None,
             trace=False,
             error_action='ignore',
             suppress_warnings=True,
-            stepwise=True,  # Més ràpid
+            stepwise=True,
             n_jobs=-1,
             information_criterion='aic'
         )
@@ -99,9 +98,6 @@ def main(trams: list = None, seasonal: bool = False):
     seasonal : bool
         Si True, busca també paràmetres estacionals (més lent)
     """
-    print("=" * 60)
-    print("AUTO ARIMA - Cerca Automàtica de Paràmetres")
-    print("=" * 60)
     
     # Llegim les dades
     df = pl.read_parquet(DATA_PATH)
@@ -112,7 +108,7 @@ def main(trams: list = None, seasonal: bool = False):
     
     print(f"Trams a analitzar: {len(trams)}")
     if seasonal:
-        print("⚠️  Mode estacional activat (pot trigar més)")
+        print("Mode estacional activat")
     
     # Analitzem cada tram
     results = []
@@ -134,7 +130,7 @@ def main(trams: list = None, seasonal: bool = False):
         result['idTram'] = tram_id
         results.append(result)
         
-        # Mostrem resultat
+        # Mostrem el resultat
         if seasonal and 'sarima_order' in result:
             print(f"  → Millor model: SARIMA{result['sarima_order']}")
         else:
@@ -142,16 +138,12 @@ def main(trams: list = None, seasonal: bool = False):
         print(f"  → AIC: {result['aic']:.2f}")
         print(f"  → BIC: {result['bic']:.2f}")
     
-    # Guardem resultats
+    # Guardem els resultats
     results_df = pl.DataFrame(results)
     results_df.write_parquet(OUTPUT_PATH)
     print(f"Resultats guardats a: {OUTPUT_PATH}")
     
     # Resum
-    print("=" * 60)
-    print("RESUM")
-    print("=" * 60)
-    
     if seasonal:
         print(results_df.select([
             "idTram", "p", "d", "q", "P", "D", "Q", "m", "aic", "sarima_order"
@@ -177,9 +169,9 @@ def main(trams: list = None, seasonal: bool = False):
 
 
 if __name__ == "__main__":
-    # Els teus 30 trams
+    # Els 30 trams seleccionats
     trams = [233,158,57,526,83,445,11,22,460,178,126,534,164,50,278,388,478,270,332,
              254,224,293,117,100,104,409,31,221,360,303]
 
-    # Executem Auto ARIMA (sense estacionalitat per ara)
+    # Executem Auto ARIMA
     results = main(trams=trams, seasonal=False)

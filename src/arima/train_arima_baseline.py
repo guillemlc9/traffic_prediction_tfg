@@ -10,7 +10,7 @@ Aquest és el model baseline per comparar amb LSTM i models espai-temporals.
 import sys
 from pathlib import Path
 
-# Afegir el directori arrel al PYTHONPATH
+# Afegim el directori arrel al PYTHONPATH
 root_dir = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(root_dir))
 
@@ -59,9 +59,9 @@ def train_arima_model(
     """
     try:
         if verbose:
-            print(f"  Entrenant ARIMA{order}...")
+            print(f"Entrenant ARIMA{order}...")
         
-        # Entrenar model
+        # Entrenem el model
         model = ARIMA(series, order=order)
         fitted_model = model.fit()
         
@@ -77,13 +77,13 @@ def train_arima_model(
         }
         
         if verbose:
-            print(f"  ✓ AIC: {result['aic']:.2f}, BIC: {result['bic']:.2f}")
+            print(f"AIC: {result['aic']:.2f}, BIC: {result['bic']:.2f}")
         
         return result
         
     except Exception as e:
         if verbose:
-            print(f"  ✗ Error: {e}")
+            print(f"Error: {e}")
         
         return {
             'model': None,
@@ -98,7 +98,7 @@ def train_arima_model(
 
 def save_model(model, tram_id: int, order: tuple, models_dir: str = MODELS_DIR) -> str:
     """
-    Guarda un model ARIMA entrenat (només paràmetres essencials).
+    Guarda un model ARIMA entrenat (només paràmetres essencials per reduir espai).
     
     Parameters
     ----------
@@ -182,41 +182,36 @@ def train_all_models(
     """
     if tram_ids is None:
         tram_ids = SELECTED_TRAMS
-    
-    print("=" * 60)
-    print("ENTRENAMENT BASELINE ARIMA")
-    print("=" * 60)
+
     print(f"Model: ARIMA{order}")
     print(f"Trams: {len(tram_ids)}")
     
-    # Carregar dades
-    print("\nCarregant dades...")
+    # Carreguem les dades
     df = pl.read_parquet(DATA_PATH)
     
-    # Obtenir splits temporals
+    # Obtenim els splits temporals
     splits_info = get_temporal_splits(df)
-    print("\nSplits temporals:")
-    print(f"  Train: {splits_info['train_start']} → {splits_info['train_end']}")
-    print(f"  Val:   {splits_info['val_start']} → {splits_info['val_end']}")
-    print(f"  Test:  {splits_info['test_start']} → {splits_info['test_end']}")
-    print("\nUtilitzant només dades de TRAIN per entrenar els models")
+    print(f"Train: {splits_info['train_start']} → {splits_info['train_end']}")
+    print(f"Val:   {splits_info['val_start']} → {splits_info['val_end']}")
+    print(f"Test:  {splits_info['test_start']} → {splits_info['test_end']}")
+    print("Utilitzant només dades de TRAIN per entrenar els models")
     
-    # Entrenar models
+    # Entrenem els models
     results = []
     for i, tram_id in enumerate(tram_ids, 1):
-        print(f"\n[{i}/{len(tram_ids)}] Tram {tram_id}")
+        print(f"[{i}/{len(tram_ids)}] Tram {tram_id}")
         
         # Obtenir dades de TRAIN
         train_data = prepare_tram_series(df, tram_id, 'train', splits_info)
         series = train_data['estatActual']
         
-        print(f"  Registres de train: {len(series)}")
-        print(f"  Rang: {series.index.min()} → {series.index.max()}")
+        print(f"Registres de train: {len(series)}")
+        print(f"Rang: {series.index.min()} → {series.index.max()}")
         
-        # Entrenar model
+        # Entrenem el model
         result = train_arima_model(series, order=order, verbose=True)
         
-        # Guardar model si s'ha entrenat correctament
+        # Guardem el model si s'ha entrenat correctament
         if result['success'] and save_models:
             model_path = save_model(result['model'], tram_id, order)
             result['model_path'] = model_path
@@ -224,7 +219,7 @@ def train_all_models(
         else:
             result['model_path'] = None
         
-        # Afegir informació del tram
+        # Afegim informació del tram
         result['idTram'] = tram_id
         result['train_start'] = splits_info['train_start']
         result['train_end'] = splits_info['train_end']
@@ -233,23 +228,18 @@ def train_all_models(
         result_without_model = {k: v for k, v in result.items() if k != 'model'}
         results.append(result_without_model)
     
-    # Crear DataFrame amb resultats
+    # Creem un DataFrame amb resultats
     results_df = pl.DataFrame(results)
     
-    # Guardar mètriques
+    # Guardem les mètriques
     Path(MODELS_DIR).mkdir(parents=True, exist_ok=True)
     results_df.write_parquet(OUTPUT_METRICS)
-    print(f"\nMètriques guardades: {OUTPUT_METRICS}")
-    
-    # Resum
-    print("\n" + "=" * 60)
-    print("RESUM ENTRENAMENT")
-    print("=" * 60)
+    print(f"Mètriques guardades: {OUTPUT_METRICS}")
     
     successful = results_df.filter(pl.col('success') == True).height
     failed = results_df.filter(pl.col('success') == False).height
     
-    print(f"\nModels entrenats correctament: {successful}/{len(tram_ids)}")
+    print(f"Models entrenats correctament: {successful}/{len(tram_ids)}")
     if failed > 0:
         print(f"Models amb errors: {failed}")
         print("\nTrams amb errors:")
@@ -259,14 +249,14 @@ def train_all_models(
     if successful > 0:
         successful_df = results_df.filter(pl.col('success') == True)
         
-        print(f"\nEstadístiques (models correctes):")
-        print(f"  AIC mitjà: {successful_df['aic'].mean():.2f}")
-        print(f"  AIC min: {successful_df['aic'].min():.2f}")
-        print(f"  AIC max: {successful_df['aic'].max():.2f}")
-        print(f"  BIC mitjà: {successful_df['bic'].mean():.2f}")
-        print(f"  Samples mitjà: {successful_df['n_samples'].mean():.0f}")
+        print(f"Estadístiques (models correctes):")
+        print(f"AIC mitjà: {successful_df['aic'].mean():.2f}")
+        print(f"AIC min: {successful_df['aic'].min():.2f}")
+        print(f"AIC max: {successful_df['aic'].max():.2f}")
+        print(f"BIC mitjà: {successful_df['bic'].mean():.2f}")
+        print(f"Samples mitjà: {successful_df['n_samples'].mean():.0f}")
     
-    print("\n✅ Entrenament completat!")
+    print("\nEntrenament completat!")
     
     return results_df
 
@@ -275,7 +265,7 @@ def main():
     """
     Funció principal per entrenar els models baseline.
     """
-    # Entrenar tots els models ARIMA(1,1,1)
+    # Entrenem tots els models ARIMA(1,1,1)
     results = train_all_models(
         tram_ids=SELECTED_TRAMS,
         order=(1, 1, 1),

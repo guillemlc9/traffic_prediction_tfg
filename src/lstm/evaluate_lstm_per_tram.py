@@ -13,7 +13,7 @@ Aquest script:
 import sys
 from pathlib import Path
 
-# Afegir el directori arrel al PYTHONPATH
+# Afegim el directori arrel al PYTHONPATH
 root_dir = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(root_dir))
 
@@ -128,7 +128,7 @@ def calculate_metrics_per_tram(
         mask = tram_ids == tram_id
         
         if not mask.any():
-            print(f"  ⚠️  Tram {tram_id}: No hi ha prediccions test")
+            print(f"Tram {tram_id}: No hi ha prediccions test")
             continue
         
         y_true_tram = y_test[mask]
@@ -147,7 +147,7 @@ def calculate_metrics_per_tram(
             'n_samples': int(mask.sum())
         })
         
-        print(f"  Tram {tram_id:3d}: MAE={mae:.4f}, RMSE={rmse:.4f}, n={mask.sum()}")
+        print(f"Tram {tram_id:3d}: MAE={mae:.4f}, RMSE={rmse:.4f}, n={mask.sum()}")
     
     return pl.DataFrame(results)
 
@@ -161,10 +161,7 @@ def main():
     DATA_PATH = "data/processed/dataset_imputed_clean.parquet"
     WINDOW_SIZE = 36
     HORIZON = 1
-    
-    print("=" * 60)
-    print("AVALUACIÓ LSTM PER TRAM")
-    print("=" * 60)
+
     print(f"Model: {MODEL_DIR}")
     print(f"Trams seleccionats: {len(SELECTED_TRAMS)}")
     print("=" * 60)
@@ -177,8 +174,8 @@ def main():
     y_test_denorm = np.load(denorm_path / "y_test_denorm.npy")
     y_pred_denorm = np.load(denorm_path / "y_pred_denorm.npy")
     
-    print(f"   ✓ y_test shape: {y_test_denorm.shape}")
-    print(f"   ✓ y_pred shape: {y_pred_denorm.shape}")
+    print(f"y_test shape: {y_test_denorm.shape}")
+    print(f"y_pred shape: {y_pred_denorm.shape}")
     
     # 2. Carregar i preparar dades per reconstruir el mapatge
     print("\n2. Reconstruint mapatge tram-predicció...")
@@ -196,11 +193,11 @@ def main():
         value_col="estatActual_norm"
     )
     
-    print(f"   ✓ Total prediccions test: {tram_mapping['n_test']}")
+    print(f"Total prediccions test: {tram_mapping['n_test']}")
     
     # Verificar que coincideix amb les prediccions carregades
     if tram_mapping['n_test'] != len(y_test_denorm):
-        print(f"\n   ⚠️  ADVERTÈNCIA: Desajust en nombre de prediccions!")
+        print(f"\nADVERTÈNCIA: Desajust en nombre de prediccions!")
         print(f"      Mapatge: {tram_mapping['n_test']}")
         print(f"      Carregades: {len(y_test_denorm)}")
         raise ValueError("El nombre de prediccions no coincideix amb el mapatge")
@@ -216,7 +213,7 @@ def main():
     # 5. Guardar resultats
     output_path = model_path / "metrics_per_tram.parquet"
     metrics_df.write_parquet(output_path)
-    print(f"\n✅ Mètriques guardades: {output_path}")
+    print(f"Mètriques guardades: {output_path}")
     
     # 6. Mostrar resum
     print("\n" + "=" * 60)
@@ -242,7 +239,7 @@ def main():
     print(f"  Max:     {metrics_df['rmse'].max():.4f}")
     
     print("\n" + "=" * 60)
-    print("✅ Avaluació completada!")
+    print("Avaluació completada!")
     print("=" * 60)
 
 

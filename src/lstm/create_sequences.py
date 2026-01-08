@@ -8,7 +8,7 @@ Genera conjunts X_train, y_train, X_val, y_val, X_test, y_test.
 import sys
 from pathlib import Path
 
-# Afegir el directori arrel al PYTHONPATH
+# Afegim el directori arrel al PYTHONPATH
 root_dir = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(root_dir))
 
@@ -27,7 +27,7 @@ def create_all_sequences(
 ) -> Dict[str, np.ndarray]:
     """
     Crea seqüències globals sense barrejar sèries entre trams.
-    Les seqüències es classifiquen en train/val/test segons el split del target.
+    Les seqüències es classifiquen en train/val/test segons l'split del target.
     """
     # Ens assegurem de l'ordre correcte
     df = df.sort(["idTram", "timestamp"])
@@ -51,11 +51,11 @@ def create_all_sequences(
             end = start + window_size
             target_idx = end + horizon - 1
 
-            window = v[start:end]              # (window_size,)
-            target = v[target_idx]             # scalar
-            split_target = s[target_idx]       # 'train' / 'val' / 'test'
+            window = v[start:end]
+            target = v[target_idx]
+            split_target = s[target_idx]
 
-            window = window.reshape(window_size, 1)  # (window_size, 1)
+            window = window.reshape(window_size, 1)
 
             if split_target == "train":
                 X_train.append(window)
@@ -92,9 +92,6 @@ def print_sequences_summary(sequences: Dict[str, np.ndarray]):
     """
     Mostra un resum de les seqüències generades.
     """
-    print("\n" + "="*60)
-    print("RESUM DE SEQÜÈNCIES GENERADES")
-    print("="*60)
     
     for split_name in ['train', 'val', 'test']:
         X_key = f'X_{split_name}'
@@ -127,14 +124,10 @@ def save_sequences(
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
     
-    print(f"\nGuardant seqüències a {output_dir}...")
-    
     for key, array in sequences.items():
         filepath = output_path / f"{key}.npy"
         np.save(filepath, array)
-        print(f"  ✓ {key}.npy guardado ({array.shape})")
-    
-    print(f"\n✅ Totes les seqüències guardades!")
+
 
 
 def load_sequences(
@@ -152,8 +145,6 @@ def load_sequences(
     input_path = Path(input_dir)
     sequences = {}
     
-    print(f"\nCarregant seqüències de {input_dir}...")
-    
     for split_name in ['train', 'val', 'test']:
         for prefix in ['X', 'y']:
             key = f"{prefix}_{split_name}"
@@ -161,9 +152,6 @@ def load_sequences(
             
             if filepath.exists():
                 sequences[key] = np.load(filepath)
-                print(f"  ✓ {key}.npy carregat ({sequences[key].shape})")
-            else:
-                print(f"  ✗ {key}.npy no trobat")
     
     return sequences
 
@@ -183,32 +171,24 @@ def main():
     DATA_PATH = "data/processed/dataset_imputed_clean.parquet"
     OUTPUT_DIR = "data/processed/lstm_sequences"
 
-    print("=" * 60)
-    print("CREACIÓ DE SEQÜÈNCIES PER LSTM (MODEL GLOBAL)")
-    print("=" * 60)
     print(f"Window size: {WINDOW_SIZE} timesteps (3 hores)")
     print(f"Horizon: {HORIZON} timestep (5 minuts)")
     print(f"Input data: {DATA_PATH}")
-    print("=" * 60)
 
-    # 1. Carregar dades
-    print(f"\n1. Carregant dades de {DATA_PATH}...")
+    # 1. Carreguem dades
     df = pl.read_parquet(DATA_PATH)
     print(f"   Shape original: {df.shape}")
 
-    # 2. Preparar dades amb splits
-    print("\n2. Preparant dades amb splits...")
+    # 2. Preparem dades amb splits
     info = get_all_trams_data(df)
     df_with_splits = info["df"]
     print(f"   Shape després de filtrar trams seleccionats: {df_with_splits.shape}")
 
-    # 3. Normalitzar
-    print("\n3. Normalitzant dades...")
+    # 3. Normalitzem dades
     df_normalized, normalizer = normalize_traffic_data(df_with_splits)
     print(f"   Columnes disponibles: {df_normalized.columns}")
 
-    # 4. Crear seqüències globals
-    print("\n4. Creant seqüències globals...")
+    # 4. Creem seqüències globals
     sequences = create_all_sequences(
         df_normalized,
         window_size=WINDOW_SIZE,
@@ -216,16 +196,14 @@ def main():
         value_col="estatActual_norm",
     )
 
-    # 5. Mostrar resum
+    # 5. Mostram resum
     print_sequences_summary(sequences)
 
-    # 6. Guardar seqüències
+    # 6. Guardem seqüències
     save_sequences(sequences, output_dir=OUTPUT_DIR)
 
-    print("\n" + "=" * 60)
-    print("✅ Processat completat!")
-    print(f"   - Seqüències globals guardades a: {OUTPUT_DIR}")
-    print("=" * 60)
+    print("Processat completat!")
+    print(f"Seqüències globals guardades a: {OUTPUT_DIR}")
 
 
 if __name__ == "__main__":

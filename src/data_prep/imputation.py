@@ -1,8 +1,7 @@
 """
 imputation.py
 -------------
-Fitxer per imputar els valors no òptims, depenent de la durada de cada
-tipus de gap entre registres, amb l'ajuda de gaps.py.
+Fitxer per imputar valors, depenent de la durada de cada tipus de gap.
 """
 
 from pathlib import Path
@@ -21,7 +20,7 @@ SRC_PARQUET = "/Users/guillemlopezcolomer/Desktop/traffic_prediction_tfg/data/da
 OUT_DIR = "data/processed"
 OUT_PARQUET = f"{OUT_DIR}/dataset_imputed.parquet"
 
-# ---------- Utils ----------
+# Utils
 
 def snap_to_5min_mode(df: pl.DataFrame) -> pl.DataFrame:
     return (
@@ -58,7 +57,7 @@ def snap_to_5min_mode(df: pl.DataFrame) -> pl.DataFrame:
 
 def build_calendar_for_tram(df5_tram: pl.DataFrame) -> pl.DataFrame:
     """
-    Calendari complet (graella 5') entre min i max per a UN idTram.
+    Calendari complet entre min i max per a un idTram.
     """
     start = df5_tram["timestamp"].min()
     end   = df5_tram["timestamp"].max()
@@ -129,7 +128,7 @@ def impute_short(df_slice: pl.DataFrame) -> pl.DataFrame:
 
 def impute_medium(df_slice: pl.DataFrame, window_minutes: int = 60) -> pl.DataFrame:
     """
-    Medium gaps: pren el valor vàlid més proper dins ±window_minutes.
+    Medium gaps: pren el valor vàlid més proper dins ± window_minutes.
     """
     tol = timedelta(minutes=window_minutes)
 
@@ -149,7 +148,7 @@ def impute_medium(df_slice: pl.DataFrame, window_minutes: int = 60) -> pl.DataFr
     if medix.is_empty() or valid.is_empty():
         return df_slice
 
-    # Veí anterior dins tolerància
+    # Veí anterior dins la tolerància
     back = medix.join_asof(
         valid.rename({"timestamp": "ts_v", "estatActual": "val_b"}),
         left_on="timestamp",
@@ -158,7 +157,7 @@ def impute_medium(df_slice: pl.DataFrame, window_minutes: int = 60) -> pl.DataFr
         tolerance=tol,
     )
 
-    # Veí posterior dins tolerància
+    # Veí posterior dins la tolerància
     fwd = medix.join_asof(
         valid.rename({"timestamp": "ts_v", "estatActual": "val_f"}),
         left_on="timestamp",
@@ -201,7 +200,7 @@ def impute_long_with_history(df_slice: pl.DataFrame) -> pl.DataFrame:
     Long gaps: imputa amb el MODE històric per (weekday, slot_5min).
     - weekday: 0=dl ... 6=dg
     - slot_5min: minut-del-dia // 5
-    Fa servir NOMÉS punts no-gap (originals) per construir la història.
+    Fa servir només punts no-gap (és a dir, originals) per construir la història.
     """
     # features temporals
     tmp = df_slice.with_columns([
@@ -212,7 +211,7 @@ def impute_long_with_history(df_slice: pl.DataFrame) -> pl.DataFrame:
         ).cast(pl.Int16).alias("_slot"),
     ])
 
-    # Històric: comptem freqüències per (wd, slot, estatActual) i triem el més freqüent
+    # Històric: comptem freqüències per (wd, slot, estatActual) i ens quedem amb el més freqüent
     hist = (
         tmp.filter(~pl.col("is_gap") & pl.col("estatActual").is_not_null())
            .group_by(["_wd", "_slot", "estatActual"])
@@ -222,7 +221,7 @@ def impute_long_with_history(df_slice: pl.DataFrame) -> pl.DataFrame:
            .agg(pl.col("estatActual").first().alias("_mode_hist"))
     )
 
-    # Fallback global (per si algun (wd,slot) no té prou històric)
+    # Mirem el mode global (per si algun (wd,slot) no té prou històric)
     fb_tbl = (
         tmp.filter(~pl.col("is_gap") & pl.col("estatActual").is_not_null())
            .group_by("estatActual").agg(pl.len().alias("w"))
@@ -231,7 +230,7 @@ def impute_long_with_history(df_slice: pl.DataFrame) -> pl.DataFrame:
     )
     global_mode = fb_tbl["_global_mode"][0] if fb_tbl.height > 0 else None
 
-    # Aplica només sobre long
+    # Aplica només sobre long gaps
     out = (
         tmp.join(hist, on=["_wd", "_slot"], how="left")
            .with_columns(
@@ -256,7 +255,7 @@ def impute_long_with_history(df_slice: pl.DataFrame) -> pl.DataFrame:
     )
     return out
 
-# ---------- Main ----------
+# Main 
 
 def main() -> None:
     Path(OUT_DIR).mkdir(parents=True, exist_ok=True)
@@ -279,7 +278,7 @@ def main() -> None:
         .alias("estatActual")
     )
 
-    # Snap a 5'
+    # fa snap a 5'
     trams: List[int] = df.select("idTram").unique().to_series().to_list()
     all_chunks: List[pl.DataFrame] = []
 
@@ -302,12 +301,12 @@ def main() -> None:
         # Gaps per tram
         full_t = classify_gaps_from_calendar(full_t, freq_minutes=FREQ_MINUTES)
 
-        # Imputacions
+        # Imputacions per categoria de gap
         full_t = impute_short(full_t)
         full_t = impute_medium(full_t, window_minutes=60)
         full_t = impute_long_with_history(full_t)
 
-        # Bandera final i selecció de columnes
+        # Variable final i selecció de columnes
         full_t = (
             full_t.with_columns(pl.col("estatActual").is_null().not_().alias("estatActual_imputed"))
                   .select([
@@ -325,7 +324,7 @@ def main() -> None:
         if i % 10 == 0 or i == len(trams):
             print(f"[{i}/{len(trams)}] Processat idTram={t} -> {full_t.height} files")
 
-    # Escriure un únic Parquet
+    # Parquet final
     if all_chunks:
         combined = pl.concat(all_chunks, how="vertical_relaxed")
         combined.write_parquet(OUT_PARQUET)
@@ -341,8 +340,8 @@ def main() -> None:
             pl.col("estatActual_imputed").sum().alias("valors_no_null_despres_imputacio"),
         ])
         print(out)
-        print(f"✔ Parquet complet: {OUT_PARQUET}")
-        print(f"✔ Parquet net (1..5): {OUT_PARQUET_CLEAN}")
+        print(f"Parquet complet: {OUT_PARQUET}")
+        print(f"Parquet net (1..5): {OUT_PARQUET_CLEAN}")
     else:
         print("No s'han generat chunks (cap tram amb dades).")
 
