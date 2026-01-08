@@ -1,6 +1,6 @@
-# Predicció de trànsit a Barcelona mitjançant xarxes neuronals espaitemporals
+# Predicció de trànsit a Barcelona mitjançant modelització temporal
 
-Aquest projecte forma part del Treball Final de Grau (TFG) i té com a objectiu comparar l'eficàcia de diferents arquitectures (T-GCN, STGCN i DCRNN) en la predicció del trànsit a la ciutat de Barcelona, utilitzant dades públiques d'Open Data BCN i dades meteorològiques.
+Aquest projecte forma part del Treball Final de Grau (TFG) i té com a objectiu comparar l'eficàcia de diferents arquitectures en la predicció del trànsit a la ciutat de Barcelona, utilitzant dades públiques d'Open Data BCN.
 
 ## Estructura del projecte
 
